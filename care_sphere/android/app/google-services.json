@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "84989395011",
+    "project_id": "care-sphere",
+    "storage_bucket": "care-sphere.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:84989395011:android:8da39b81522328fcbad4f6",
+        "android_client_info": {
+          "package_name": "com.example.care_sphere"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwmNxBIkQQgbeNBuLk8xF8NgBk5eg5E78"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

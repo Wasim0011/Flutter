@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"android":{"default":{"projectId":"care-sphere","appId":"1:84989395011:android:8da39b81522328fcbad4f6","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"care-sphere","configurations":{"android":"1:84989395011:android:8da39b81522328fcbad4f6","ios":"1:84989395011:ios:ed77de1dfc4688c9bad4f6"}}}}}}

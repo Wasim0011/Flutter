@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1057931701884",
+    "project_id": "chat-85ba2",
+    "storage_bucket": "chat-85ba2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1057931701884:android:54eac6c2617b4ecbe4a3f9",
+        "android_client_info": {
+          "package_name": "com.wasim.flash_chat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmnpsFn5w40LtOiPbHpURMXdhsj44oLbo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
