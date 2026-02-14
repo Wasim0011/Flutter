@@ -1,0 +1,19 @@
+abstract class StaticAssets {
+  static const String waveGif = 'images/hi.gif';
+
+  /// Profile Images
+  /// Three variants are required
+  /// 1. Black and white
+  /// 2. Colored image of same size
+  /// 3. Mobile image (Preferred with border and circular avatar)
+  ///
+  static const String bwImage = 'images/photos/black-white.png';
+  static const String coloredImage = 'images/photos/pic.png';
+  static const String mobileImage = 'images/photos/pic.png';
+
+
+  /// Work Images
+  static const String cui = 'images/work/cui.png';
+  static const String dsc = 'images/work/dsc.png';
+  static const String flutterisl = 'images/work/flutterIsl.png';
+  static const String st = 'images/work/st.png';}

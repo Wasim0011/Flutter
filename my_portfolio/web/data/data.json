@@ -1,0 +1,247 @@
+{
+    "basic": {
+        "firstName": "Md",
+        "lastName": "Wasim",
+        "age": 22,
+        "email": "mwasim060.btech2022@gmail.com",
+        "phone": "+92 8252616689",
+        "address": "Bihar, India",
+        "photos": [
+            "images/photos/bw.png",
+            "images/photos/mobile.png",
+            "images/photos/mobile.png"
+        ],
+        "resume": "https://drive.google.com/file/d/1wD8fpcJ1pontBO0_Bx-06FqQhNHl1CLN/view?usp=sharing"
+    },
+    "socials": [
+        {
+            "icon": "fa-brands fa-linkedin",
+            "url": "https://www.linkedin.com/in/md-wasim-154590200/"
+        },
+
+        {
+            "icon": "fa-brands fa-github",
+            "url": "https://github.com/Wasim0011"
+        },
+        {
+            "icon": "fa-brands fa-instagram",
+            "url": "https://www.instagram.com/mdwasim3456/"
+        }
+    ],
+    "about": {
+        "heading": "Md Wasim | Flutter Developer • AI/ML Enthusiast • Robotics & IoT Innovator",
+        "description": "I'm a third-year B.Tech student in Electronics and Communication Engineering at NIT Raipur, with a strong passion for Flutter development, AI/ML, and robotics. I have been working with Flutter for the past one year, developing applications for both Android and iOS. I have developed multiple applications using Flutter, including a dynamic Quiz App and a BMI Calculator, focusing on functionality and user engagement. Additionally, I have hands-on experience in AI/ML, having worked on human activity recognition using CSI signals during my research internship at IIT Patna. Beyond development, I have participated in competitive programming and technical competitions, achieving recognition in events like Adobe GenSolve and Avinya at NIT Raipur.",
+        "tech": [
+            "Flutter",
+            "Dart",
+            "Firebase",
+            "Python",
+            "jaspr",
+            "OpenCV",
+            "C++",
+            "SQL",
+            "HTML",
+            "CSS"
+        ],
+        "works": [
+            {
+                "image": "images/work/geeks.jpg",
+                "url": "https://www.geeksforgeeks.org/user/wmd099vm/",
+                "height": 50
+            },
+            {
+                "image": "images/work/cui.png",
+                "url": "https://www.nitrr.ac.in/",
+                "height": 50
+            },
+            {
+                "image": "images/work/dsc.png",
+                "url": "https://www.iitp.ac.in/",
+                "height": 50
+            },
+            {
+                "image": "images/work/flutterIsl.png",
+                "url": "https://nitrr.ac.in/downloads/stu%20welfare/Robotix%20club.pdf",
+                "height": 50
+            },
+            {
+                "image": "images/work/st.png",
+                "url": "https://www.nitrr.ac.in/UBA/index.html",
+                "height": 50
+            }
+        ]
+    },
+    "services": [
+        {
+            "icon": "images/services/app.png",
+            "title": "Flutter Development"
+        },
+        {
+            "icon": "images/services/frontend.png",
+            "title": "Frontend Development"
+        },
+        {
+            "icon": "images/services/ds_ml.png",
+            "title": "Data Science/ML"
+        },
+        {
+            "icon": "images/services/robotics_ai.png",
+            "title": "Robotics/AI"
+        },
+        {
+            "icon": "images/services/open.png",
+            "title": "Open Source - GitHub"
+        }
+    ],
+    "projects": [
+        {
+            "banner": "images/projects/BMI_calculator.png",
+            "icon": "images/projects/BMI_calculator_f.png",
+            "title": "BMI Calculator",
+            "description": "The BMI Calculator App is a clean, interactive Flutter app that lets users input their height and weight to calculate BMI, showing the result with a health category and quick interpretation.",
+            "link": "https://github.com/Wasim0011/Flutter/tree/main/bmi_calculator"
+        },
+        {
+            "banner": "images/projects/robowar.jpeg",
+            "icon": "images/projects/robowar_f.png",
+            "title": "Combat Robot",
+            "description": "Participated in International Robowars @ IIT Bombay (Techfest 2023)\nAs part of Team Tech-Titans, we designed and built a combat robot from scratch and competed at one of India’s biggest robotics events—Techfest, IIT Bombay.",
+            "link": "https://github.com/Wasim0011/Transmitter"
+        },
+        {
+            "banner": "images/projects/ClapSwitch.jpeg",
+            "icon": "images/projects/ClapSwitch_f.jpg",
+            "title": "Clap Switch",
+            "description": "The system is designed to detect clapping sounds and trigger an electrical appliance or light, making it an excellent addition to home automation and accessibility applications.",
+            "link": "https://github.com/Wasim0011/Arduino/tree/main/ClapSwitch"
+        },
+        {
+            "banner": "images/projects/RaceCar.jpeg",
+            "icon": "images/projects/RaceCar_f.jpg",
+            "title": "Race Car",
+            "description": "This race car is controlled using a wireless transmitter I designed and built from scratch. It features dual DC motors, off-road tires, and a custom-built circuit for real-time control.",
+            "link": "https://github.com/Wasim0011/Transmitter/tree/main/RaceCar"
+        },
+        {
+            "banner": "images/projects/quiz.png",
+            "icon": "images/projects/quiz_f.png",
+            "title": "Quiz App",
+            "description": "This is an interactive mobile app designed to test your knowledge across a variety of topics. With a sleek design and timed challenges, users can enjoy quick quizzes, track their scores, and learn as they play. ",
+            "link": "https://github.com/Wasim0011/Flutter/tree/main/quiz"
+        },
+        {
+            "banner": "images/projects/bitcoin.png",
+            "icon": "images/projects/bitcoin_f.jpg",
+            "title": "Bitcoin Ticker",
+            "description": "A simple and clean crypto tracker app showing real-time prices for Bitcoin, Ethereum, and Litecoin in multiple currencies like USD and INR. Includes an easy currency switcher and color-coded UI for quick insights.",
+            "link": "https://github.com/Wasim0011/Flutter/tree/main/bitcoin_ticker"
+        },
+        {
+            "banner": "images/projects/clima.png",
+            "icon": "images/projects/clima_f.jpg",
+            "title": "Clima",
+            "description": "A sleek weather app that uses live API data to show real-time conditions based on your location, with helpful tips to keep you informed and prepared.",
+            "link": "https://github.com/Wasim0011/Flutter/tree/main/clima"
+        },
+        {
+            "banner": "images/projects/WaterIrrigationSystem.jpg",
+            "icon": "images/projects/WaterIrrigationSystem_f.png",
+            "title": "Automated Irrigation System",
+            "description": "This \nsystem will utilize the waste water, save the plant and also stop further wastage of water by \nirrigating the soil according to the requirement of soil.",
+            "link": "https://github.com/Wasim0011/Arduino/tree/main/SmartWaterIrrigationSystem"
+        },
+        {
+            "banner": "images/projects/todo.png",
+            "icon": "images/projects/todo_f.jpg",
+            "title": "",
+            "description": "Stay organized and productive with our simple and intuitive to-do list app. Effortlessly manage tasks, track daily goals, and keep your life on schedule—all in one place.",
+            "link": "https://github.com/Wasim0011/Flutter/tree/main/todo_app"
+        },
+        {
+            "banner": "images/projects/SmartDustbin.jpg",
+            "icon": "images/projects/SmartDustbin_f.jpg",
+            "title": "Smart Dustbin",
+            "description": "The Smart Dustbin Robot project aims to revolutionize waste management by introducing an intelligent robotic system capable of autonomously collecting and segregating garbage. ",
+            "link": "https://github.com/Wasim0011/Arduino/tree/main/SmartDustbin"
+        }
+    ],
+    "certificates": [
+        {
+            "banner": "images/certificates/adobe_gensolve.jpg",
+            "icon": "images/certificates/adobe_gensolve_f.png",
+            "title": "Adobe Gensolve Hackathon",
+            "description": "Achieved top 5 percentile in Adobe GenSolve 2024, a national hackathon with 100,000+ students from 400+ colleges, recognized for innovation and impact!",
+            "link": "https://drive.google.com/file/d/1StRBnWDFfIu9T8IzmW-WCN9pBVn4RING/view?usp=sharing"
+        },
+        {
+            "banner": "images/certificates/UdemyC++.jpg",
+            "icon": "images/certificates/UdemyC++_f.png",
+            "title": "C++ Programming Certificate",
+            "description": "Completed a 30.5-hour Udemy course titled \"Learn C++ Programming – Beginner to Advance – Deep Dive in C++\" by Abdul Bari, covering foundational to advanced C++ concepts.",
+            "link": "https://drive.google.com/file/d/1RNG_sgjFiNstZ13oNyTwydGpVLK2l4c4/view?usp=sharing"
+        },
+        {
+            "banner": "images/certificates/gfg_dsa_certificate.jpg",
+            "icon": "images/certificates/gfg_dsa_certificate_f.jpg",
+            "title": "DSA Self Paced Course",
+            "description": "Successfully completed a 16-week self-paced course on Data Structures and Algorithms offered by GeeksforGeeks, covering core DSA concepts essential for coding and problem-solving.",
+            "link": "https://drive.google.com/file/d/1sWwPUV_oQc3bwKhyoaI5yni1r0HNZROK/view?usp=sharing"
+        },
+        {
+            "banner": "images/certificates/IITP_internCertificate.jpg",
+            "icon": "images/certificates/IITP_internCertificate_f.png",
+            "title": "Research Intern",
+            "description": "Completed a one-month research internship at the IoT Lab, Department of EE, IIT Patna (May 8 – June 8, 2024), under the guidance of Dr. Sudhir Kumar. Worked on the project \"Human Activity Recognition using CSI signals.",
+            "link": "https://drive.google.com/file/d/1idzfnMRbJR2GeOr9rJjJZjSQQKVI11Tw/view?usp=sharing"
+        },
+        {
+            "banner": "images/certificates/Flutter_certificate.jpg",
+            "icon": "images/certificates/Flutter_certificate_f.png",
+            "title": "App Development",
+            "description": "Completed The Complete Flutter Development Bootcamp with Dart by Dr. Angela Yu on Udemy (29 hours, Nov 2024).",
+            "link": "https://drive.google.com/file/d/1uQayqnMpo1_lzuGez9AX_rhVMEYqFr9N/view?usp=sharing"
+        },
+        {
+            "banner": "images/certificates/TCScertificate.jpg",
+            "icon": "images/certificates/TCScertificate_f.png",
+            "title": "Virtual Experience Program",
+            "description": "Completed the TCS ESG Virtual Experience Program on Forage (Aug 2023), gaining practical skills in client analysis, sustainability assessment, and fitment matrix presentation.",
+            "link": "https://drive.google.com/file/d/1iWbz71ihSqpG5hLv0V7k0LkHSgG7KmmM/view?usp=sharing"
+        },
+        {
+            "banner": "images/certificates/IITP_online_internCertificate1.jpg",
+            "icon": "images/certificates/IITP_internCertificate_f.png",
+            "title": "Online Internship",
+            "description": "Successfully completed an online internship offered by Department of Computer Science and Engineering, IIT Patna (May 5 – June 15, 2024), under the mentorship of Dr. Mayank Agarwal. Worked on the project \"Detection of Cyber-Security Attacks using ML and DL\".",
+            "link": "https://drive.google.com/file/d/1petyz9dVQdP_3inG3PEFjm8GyvE0Dm_8/view?usp=sharing"
+        },
+        {
+            "banner": "images/certificates/AWS_certificate.jpg",
+            "icon": "images/certificates/AWS_certificate_f.png",
+            "title": "AWS Fundamentals",
+            "description": "Completed a 9.5-hour Udemy course on AWS cloud fundamentals, covering key services, architecture, and cloud concepts, taught by certified AWS expert Neal Davis.",
+            "link": "https://drive.google.com/file/d/1xlxRC7gnIMEd08M3tWKG3UDM-rKNgSbn/view?usp=sharing"
+        }
+    ],
+
+    "contact": [
+        {
+            "icon": "fa-solid fa-house",
+            "title": "Location",
+            "description": "Bihar, India",
+            "action": "https://maps.app.goo.gl/MXozPxof7WDxSLbs9"
+        },
+        {
+            "icon": "fa-solid fa-phone",
+            "title": "Phone",
+            "description": "+91 8252616689",
+            "action": "https://wa.me/+918252616689?text=Hello%20Wasim%2C%20I%20found%20your%20Portfolio%20awesome!\n"
+        },
+        {
+            "icon": "fa-solid fa-envelope",
+            "title": "Email",
+            "description": "wasim001259@gmail.com",
+            "action": "mailto:wasim001259@gmail.com?subject=Hello%20Wasim&body=I%20checked%20your%20Portfolio%20and%20wanted%20to%20connect.\n"
+        }
+    ]
+}
