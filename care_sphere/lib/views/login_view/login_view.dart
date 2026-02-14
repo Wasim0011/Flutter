@@ -4,6 +4,7 @@ import 'package:care_sphere/res/components/custom_button.dart';
 import 'package:care_sphere/res/components/custom_textfield.dart';
 import 'package:care_sphere/views/appointment_view/appointment_view.dart';
 import 'package:care_sphere/views/signup_view/signup_view.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import '../home_view/home.dart';
 
@@ -53,6 +54,7 @@ class _LoginViewState extends State<LoginView> {
                     CustomTextfield(
                       hint: AppStrings.passwordHint,
                       textController: controller.passwordController,
+                      isPassword: true,
                     ),
                     10.heightBox,
                     SwitchListTile(
@@ -89,18 +91,50 @@ class _LoginViewState extends State<LoginView> {
                           },
                         ),
                         20.heightBox,
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            AppStyles.normal(title: AppStrings.dontHaveAccount),
-                            8.widthBox,
-                            GestureDetector(
-                              onTap: () {
-                                Get.to(() => const SignupView());
-                              },
-                              child: AppStyles.bold(title: AppStrings.signup),
-                            ),
-                          ],
+                        Obx(
+                              () => controller.isLoading.value
+                              ? Center(child: CircularProgressIndicator())
+                              : Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CustomButton(
+                                buttonText: AppStrings.login,
+                                onTap: () async {
+                                  await controller.loginUser();
+                                  if (controller.userCredential != null) {
+                                    // Check if user is a doctor AFTER login
+                                    var data = await FirebaseFirestore.instance
+                                        .collection('doctors')
+                                        .doc(controller.userCredential!.user!.uid)
+                                        .get();
+                                    var isDoc = data.data()?.containsKey('docName') ?? false;
+
+                                    if (isDoc) {
+                                      Get.offAll(() => const AppointmentView(isDoctor: true,));
+                                    } else {
+                                      Get.offAll(() => const Home());
+                                    }
+                                  }
+                                },
+                              ),
+                              20.heightBox,
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  AppStyles.normal(
+                                      title: AppStrings.dontHaveAccount),
+                                  8.widthBox,
+                                  GestureDetector(
+                                    onTap: () {
+                                      Get.to(() => const SignupView());
+                                    },
+                                    child: AppStyles.bold(
+                                        title: AppStrings.signup),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),

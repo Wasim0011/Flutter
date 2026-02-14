@@ -13,6 +13,31 @@ class BookAppointmentView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var controller = Get.put(AppointmentController());
+
+    // Function to handle date picking
+    Future<void> _selectDate(BuildContext context) async {
+      final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime.now(),
+        lastDate: DateTime(2101),
+      );
+      if (picked != null) {
+        controller.appDayController.text = "${picked.toLocal()}".split(' ')[0];
+      }
+    }
+
+    // Function to handle time picking
+    Future<void> _selectTime(BuildContext context) async {
+      final TimeOfDay? picked = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+      );
+      if (picked != null) {
+        controller.appTimeController.text = picked.format(context);
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
           backgroundColor: AppColors.blueColor,
@@ -30,16 +55,26 @@ class BookAppointmentView extends StatelessWidget {
             children: [
               AppStyles.bold(title: "Select appointment day"),
               5.heightBox,
-              CustomTextfield(
-                hint: "Select day",
-                textController: controller.appDayController,
+              GestureDetector(
+                onTap: () => _selectDate(context),
+                child: AbsorbPointer( // Makes the text field not focusable
+                  child: CustomTextfield(
+                    hint: "Select day",
+                    textController: controller.appDayController,
+                  ),
+                ),
               ),
               10.heightBox,
               AppStyles.bold(title: "Select appointment time"),
               5.heightBox,
-              CustomTextfield(
-                hint: "Select time",
-                textController: controller.appTimeController,
+              GestureDetector(
+                onTap: () => _selectTime(context),
+                child: AbsorbPointer(
+                  child: CustomTextfield(
+                    hint: "Select time",
+                    textController: controller.appTimeController,
+                  ),
+                ),
               ),
               20.heightBox,
               AppStyles.bold(title: "Mobile Number:"),
@@ -47,6 +82,7 @@ class BookAppointmentView extends StatelessWidget {
               CustomTextfield(
                 hint: "Enter your mobile number",
                 textController: controller.appMobileController,
+                keyboardType: TextInputType.phone,
               ),
               10.heightBox,
               AppStyles.bold(title: "Full Name:"),
@@ -61,6 +97,7 @@ class BookAppointmentView extends StatelessWidget {
               CustomTextfield(
                 hint: "Enter your message",
                 textController: controller.appMessageController,
+                maxLines: 3,
               ),
             ],
           ),
@@ -76,8 +113,15 @@ class BookAppointmentView extends StatelessWidget {
               : CustomButton(
                   buttonText: "Book an appointment",
                   onTap: () async {
-                    await controller.bookAppointment(docId, docName, context);
-                    Get.back();
+                    if (controller.appDayController.text.isNotEmpty &&
+                        controller.appTimeController.text.isNotEmpty &&
+                        controller.appMobileController.text.isNotEmpty &&
+                        controller.appNameController.text.isNotEmpty) {
+                      await controller.bookAppointment(docId, docName, context);
+                      Get.back();
+                    } else {
+                      VxToast.show(context, msg: "Please fill all fields");
+                    }
                   },
                 ),
         ),

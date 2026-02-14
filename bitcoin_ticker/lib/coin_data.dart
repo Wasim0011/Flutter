@@ -47,7 +47,7 @@ class CoinData {
         var lastPrice = decodedData['rate'];
         cryptoPrices[crypto] = lastPrice.toStringAsFixed(0);
       } else {
-        print(response.statusCode);
+        // print(response.statusCode);
         throw 'Problem with the get request';
       }
     }

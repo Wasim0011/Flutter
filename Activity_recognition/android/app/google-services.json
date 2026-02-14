@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "675843213892",
+    "project_id": "csi-activity-recognition-b5f15",
+    "storage_bucket": "csi-activity-recognition-b5f15.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:675843213892:android:b44c07226f31219a6dca11",
+        "android_client_info": {
+          "package_name": "com.example.activity_recognition"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHNvVpFl6cjuT2O6F3D2La9dMfbxion5s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

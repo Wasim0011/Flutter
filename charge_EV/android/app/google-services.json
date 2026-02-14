@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "31532984271",
+    "project_id": "charge-ev-18daa",
+    "storage_bucket": "charge-ev-18daa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:31532984271:android:8c87b9a099af85f75494ba",
+        "android_client_info": {
+          "package_name": "com.example.charge_ev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVpPKzs4-YtPqjuHz14Nvusb0pTkJfTsM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

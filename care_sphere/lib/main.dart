@@ -18,7 +18,54 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      theme: ThemeData(fontFamily: AppFonts.nunito),
+      theme: ThemeData(
+        fontFamily: AppFonts.nunito,
+        primaryColor: AppColors.blueColor,
+        scaffoldBackgroundColor: AppColors.bgColor,
+        colorScheme: ColorScheme.light(
+          primary: AppColors.blueColor,
+          secondary: AppColors.yellowColor,
+          background: AppColors.bgColor,
+          onBackground: AppColors.textColor,
+        ),
+
+        appBarTheme: AppBarTheme(
+          backgroundColor: AppColors.blueColor,
+          elevation: 0.0,
+          iconTheme: IconThemeData(color: AppColors.whiteColor),
+          titleTextStyle: TextStyle(
+            fontFamily: AppFonts.nunitoBold,
+            fontSize: AppSizes.size18,
+            color: AppColors.whiteColor,
+          ),
+        ),
+
+        textTheme: TextTheme(
+          titleLarge: TextStyle(
+            fontFamily: AppFonts.nunitoBold,
+            fontSize: AppSizes.size18,
+            color: AppColors.textColor),
+          bodyMedium: TextStyle(
+            fontFamily: AppFonts.nunito,
+            fontSize: AppSizes.size14,
+            color: AppColors.textColor),
+          labelLarge: TextStyle(
+            fontFamily: AppFonts.nunitoBold,
+            fontSize: AppSizes.size16,
+            color: AppColors.whiteColor,
+          )
+        ),
+
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            shape: StadiumBorder(),
+            backgroundColor: AppColors.blueColor,
+            textStyle: TextStyle(
+              color: AppColors.whiteColor, fontFamily: AppFonts.nunitoBold),
+            padding: EdgeInsets.symmetric(vertical: 12),
+          )
+        )
+      ),
       debugShowCheckedModeBanner: false,
       home: WaitingScreen(),
     );

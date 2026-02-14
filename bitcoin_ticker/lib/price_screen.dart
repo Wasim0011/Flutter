@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 // import 'dart:io' show Platform; //for identifying platform(android, ios....)
 import 'coin_data.dart';
 
 class PriceScreen extends StatefulWidget {
+  const PriceScreen({super.key});
+
   @override
   _PriceScreenState createState() => _PriceScreenState();
 }
@@ -15,8 +18,8 @@ class _PriceScreenState extends State<PriceScreen> {
     List<DropdownMenuItem<String>> dropdownItems = [];
     for (String currency in currenciesList) {
       var newItem = DropdownMenuItem(
-        child: Text(currency),
         value: currency,
+        child: Text(currency),
       );
       dropdownItems.add(newItem);
     }
@@ -39,7 +42,7 @@ class _PriceScreenState extends State<PriceScreen> {
       pickerItems.add(
           Text(
           currency,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.yellowAccent,
                 fontWeight: FontWeight.bold
           ),));
@@ -71,7 +74,9 @@ class _PriceScreenState extends State<PriceScreen> {
         coinValues=data;
       });
     }catch(e){
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 
@@ -85,8 +90,8 @@ class _PriceScreenState extends State<PriceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xDF5d1eb5),
-        title: Text('🤑 Coin Ticker'),
+        backgroundColor: const Color(0xDF5d1eb5),
+        title: const Text('🤑 Coin Ticker'),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -108,14 +113,14 @@ class _PriceScreenState extends State<PriceScreen> {
                 color: Colors.purple,
               ),
       Padding(
-        padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+        padding: const EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
         child: Card(
           color: Colors.white,
           elevation: 5.0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),
-          child: Padding(
+          child: const Padding(
             padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
             child: Text(
               'BTC: Bitcoin\n'
@@ -146,7 +151,7 @@ class _PriceScreenState extends State<PriceScreen> {
 }
 
 class CryptoCard extends StatelessWidget {
-  const CryptoCard({
+  const CryptoCard({super.key,
     required this.value,
     required this.selectedCurrency,
     required this.cryptoCurrency,
@@ -161,7 +166,7 @@ class CryptoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+      padding: const EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
       child: Card(
         color: color,
         elevation: 5.0,
@@ -169,11 +174,11 @@ class CryptoCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(10.0),
         ),
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+          padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
           child: Text(
             '1 $cryptoCurrency = $value $selectedCurrency',
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 20.0,
               color: Colors.white,
             ),

@@ -7,13 +7,21 @@ class CustomTextfield extends StatefulWidget {
   final Color textColor;
   final Color borderColor;
   final Color inputColor;
+  final bool isPassword;
+  final TextInputType? keyboardType;
+  final int? maxLines;
+
   const CustomTextfield(
       {super.key,
       required this.hint,
       this.textController,
       this.textColor = Colors.black,
       this.borderColor = Colors.black,
-      this.inputColor = Colors.black});
+      this.inputColor = Colors.black,
+      this.isPassword = false,
+      this.keyboardType,
+      this.maxLines = 1
+      });
 
   @override
   State<CustomTextfield> createState() => _CustomTextfieldState();
@@ -26,6 +34,9 @@ class _CustomTextfieldState extends State<CustomTextfield> {
       controller: widget.textController,
       cursorColor: AppColors.blueColor,
       style: TextStyle(color: widget.inputColor),
+      obscureText: widget.isPassword,
+      keyboardType: widget.keyboardType,
+      maxLines: widget.maxLines,
       decoration: InputDecoration(
           isDense: true,
           focusedBorder: OutlineInputBorder(

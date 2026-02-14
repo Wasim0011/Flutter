@@ -1,15 +1,23 @@
+import 'dart:io';
+
 import 'package:care_sphere/consts/consts.dart';
 import 'package:care_sphere/views/appointment_view/appointment_view.dart';
 import 'package:care_sphere/views/home_view/home.dart';
 import 'package:care_sphere/views/login_view/login_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart' as storage;
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
 
 class AuthController extends GetxController {
   var fullnameController = TextEditingController();
   var passwordController = TextEditingController();
   var emailController = TextEditingController();
+
+  var isLoading = false.obs;
 
   //doctor editing controller
   var aboutController = TextEditingController();
@@ -18,6 +26,9 @@ class AuthController extends GetxController {
   var timingController = TextEditingController();
   var phoneController = TextEditingController();
   var categoryController = TextEditingController();
+
+  var imagePath = ''.obs;
+  String? imageLink; // To store the download URL
 
   UserCredential? userCredential;
 
@@ -30,7 +41,7 @@ class AuthController extends GetxController {
             .get();
         var isDoc = data.data()?.containsKey('docName') ?? false;
         if(isDoc){
-          Get.offAll(() => AppointmentView());
+          Get.offAll(() => AppointmentView(isDoctor: true,));
         }else {
           Get.offAll(() => Home());
         }
@@ -41,15 +52,45 @@ class AuthController extends GetxController {
   }
 
   loginUser() async {
-    userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text, password: passwordController.text);
+    isLoading(true); // Set loading to true
+    try {
+      userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: emailController.text, password: passwordController.text);
+    } on FirebaseAuthException catch (e) {
+      VxToast.show(Get.context!, msg: e.toString());
+    } finally {
+      isLoading(false); // Set loading to false
+    }
   }
 
   signupUser(bool isDoctor) async {
-    userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text, password: passwordController.text);
-    await storeUserData(userCredential!.user!.uid, fullnameController.text,
-        emailController.text, isDoctor);
+    isLoading(true); // Set loading to true
+    try {
+      userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailController.text, password: passwordController.text);
+
+      // --- START: Image Upload Logic ---
+      if (isDoctor && imagePath.value.isNotEmpty) {
+        var filename = basename(imagePath.value);
+        var destination =
+            'doctors/${userCredential!.user!.uid}/profile_pic/$filename';
+        storage.Reference ref =
+        storage.FirebaseStorage.instance.ref().child(destination);
+        await ref.putFile(File(imagePath.value));
+        imageLink = await ref.getDownloadURL();
+      }
+      // --- END: Image Upload Logic ---
+      await storeUserData(userCredential!.user!.uid, fullnameController.text,
+          emailController.text, isDoctor);
+    } on FirebaseAuthException catch (e) {
+      // If user creation fails, delete the user to avoid orphan accounts
+      if(userCredential != null){
+        await userCredential!.user!.delete();
+      }
+      VxToast.show(Get.context!, msg: e.toString());
+    } finally {
+      isLoading(false); // Set loading to false
+    }
   }
 
   storeUserData(String uid, String fullname, String email, bool isDoctor) async {

@@ -18,6 +18,7 @@ class _SignupViewState extends State<SignupView> {
   @override
   Widget build(BuildContext context) {
     var controller = Get.put(AuthController());
+    controller.imagePath.value = '';
 
     return Scaffold(
       body: Center(
@@ -58,6 +59,7 @@ class _SignupViewState extends State<SignupView> {
                       CustomTextfield(
                         hint: AppStrings.password,
                         textController: controller.passwordController,
+                        isPassword: true,
                       ),
                       10.heightBox,
                       SwitchListTile(
@@ -73,9 +75,36 @@ class _SignupViewState extends State<SignupView> {
                         visible: isDoctor,
                         child: Column(
                           children: [
+                            // --- START: Image Picker UI ---
+                            10.heightBox,
+                            Obx(
+                                  () => GestureDetector(
+                                onTap: () {
+                                  controller.pickImage();
+                                },
+                                child: CircleAvatar(
+                                  radius: 50,
+                                  backgroundImage: controller
+                                      .imagePath.value.isNotEmpty
+                                      ? FileImage(
+                                      File(controller.imagePath.value))
+                                  as ImageProvider
+                                      : AssetImage(AppAssets.icLogin),
+                                  child: controller.imagePath.value.isEmpty
+                                      ? Icon(Icons.camera_alt,
+                                      color: Colors.white)
+                                      : null,
+                                ),
+                              ),
+                            ),
+                            10.heightBox,
+                            AppStyles.normal(title: "Add profile picture"),
+                            10.heightBox,
+                            // --- END: Image Picker UI ---
                             CustomTextfield(
                               hint: 'About',
                               textController: controller.aboutController,
+                              maxLines: 3,
                             ),
                             10.heightBox,
                             CustomTextfield(
@@ -96,6 +125,7 @@ class _SignupViewState extends State<SignupView> {
                             CustomTextfield(
                               hint: 'Phone Number',
                               textController: controller.phoneController,
+                              keyboardType: TextInputType.phone,
                             ),
                             10.heightBox,
                             CustomTextfield(
@@ -107,30 +137,41 @@ class _SignupViewState extends State<SignupView> {
                         ),
                       ),
                       20.heightBox,
-                      CustomButton(
-                        buttonText: AppStrings.signup,
-                        onTap: () async {
-                          await controller.signupUser(isDoctor);
-                          if (controller.userCredential != null) {
-                            Get.offAll(() => Home());
-                          }
-                        },
+                      // --- START: Obx Loading Indicator ---
+                      Obx(
+                            () => controller.isLoading.value
+                            ? Center(child: CircularProgressIndicator())
+                            : Column(
+                          children: [
+                            CustomButton(
+                              buttonText: AppStrings.signup,
+                              onTap: () async {
+                                await controller.signupUser(isDoctor);
+                                if (controller.userCredential != null) {
+                                  Get.offAll(() => Home());
+                                }
+                              },
+                            ),
+                            20.heightBox,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                AppStyles.normal(
+                                    title: AppStrings.alreadyHaveAccount),
+                                8.widthBox,
+                                GestureDetector(
+                                  onTap: () {
+                                    Get.back();
+                                  },
+                                  child: AppStyles.bold(
+                                      title: AppStrings.login),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                      20.heightBox,
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          AppStyles.normal(
-                              title: AppStrings.alreadyHaveAccount),
-                          8.widthBox,
-                          GestureDetector(
-                            onTap: () {
-                              Get.back();
-                            },
-                            child: AppStyles.bold(title: AppStrings.login),
-                          ),
-                        ],
-                      ),
+                      // --- END: Obx Loading Indicator ---
                     ],
                   ),
                 ),

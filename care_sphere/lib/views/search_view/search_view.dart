@@ -19,12 +19,20 @@ class SearchView extends StatelessWidget {
             size: AppSizes.size18),
       ),
       body: FutureBuilder<QuerySnapshot>(
-          future: FirebaseFirestore.instance.collection('doctors').get(),
+          future: FirebaseFirestore.instance
+              .collection('doctors')
+              .where('docName', isGreaterThanOrEqualTo: searchQuery)
+              .where('docName', isLessThanOrEqualTo: searchQuery + '\uf8ff')
+              .get(),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (!snapshot.hasData) {
               return Center(
                 child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.data!.docs.isEmpty) {
+              return Center(
+                child: AppStyles.normal(title: "No results found"),
               );
             } else {
               return Padding(
@@ -40,47 +48,44 @@ class SearchView extends StatelessWidget {
                     itemBuilder: (BuildContext context, int index) {
                       var doc = snapshot.data!.docs[index];
 
-                      return !doc['docName'].toString().toLowerCase().contains(searchQuery.toLowerCase())
-                          ? SizedBox.shrink()
-                          : GestureDetector(
-                        onTap: (){
-                          Get.to(()=>DoctorProfileView(doc: doc));
+                      return GestureDetector(
+                        onTap: () {
+                          Get.to(() => DoctorProfileView(doc: doc));
                         },
-                            child: Container(
-                                clipBehavior: Clip.hardEdge,
-                                decoration: BoxDecoration(
-                                    color: AppColors.bgDarkColor,
-                                    borderRadius: BorderRadius.circular(12)),
-                                margin: EdgeInsets.only(right: 8),
-                                height: 100,
-                                width: 150,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      alignment: Alignment.center,
-                                      color: AppColors.blueColor,
-                                      child: Image.asset(
-                                        AppAssets.icLogin,
-                                        width: 120,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                    5.heightBox,
-                                    AppStyles.normal(title: doc['docName']),
-                                    VxRating(
-                                      selectionColor: AppColors.yellowColor,
-                                      onRatingUpdate: (value) {},
-                                      maxRating: 5,
-                                      count: 5,
-                                      value: double.parse(
-                                          doc['docRating'].toString()),
-                                      stepInt: true,
-                                    )
-                                  ],
+                        child: Container(
+                            clipBehavior: Clip.hardEdge,
+                            decoration: BoxDecoration(
+                                color: AppColors.bgDarkColor,
+                                borderRadius: BorderRadius.circular(12)),
+                            margin: EdgeInsets.only(right: 8),
+                            height: 100,
+                            width: 150,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  alignment: Alignment.center,
+                                  color: AppColors.blueColor,
+                                  child: Image.asset(
+                                    AppAssets.icLogin,
+                                    width: 120,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                5.heightBox,
+                                AppStyles.normal(title: doc['docName']),
+                                VxRating(
+                                  selectionColor: AppColors.yellowColor,
+                                  onRatingUpdate: (value) {},
+                                  maxRating: 5,
+                                  count: 5,
+                                  value:
+                                      double.parse(doc['docRating'].toString()),
+                                  stepInt: true,
                                 )
-                              ),
-                          );
+                              ],
+                            )),
+                      );
                     }),
               );
             }
