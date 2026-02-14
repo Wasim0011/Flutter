@@ -1,0 +1,2 @@
+C:/Users/prati/OneDrive/Desktop/Gossip/gossip.com/android/app/.cxx/RelWithDebInfo/6v6jys6u/x86/CMakeFiles/edit_cache.dir
+C:/Users/prati/OneDrive/Desktop/Gossip/gossip.com/android/app/.cxx/RelWithDebInfo/6v6jys6u/x86/CMakeFiles/rebuild_cache.dir

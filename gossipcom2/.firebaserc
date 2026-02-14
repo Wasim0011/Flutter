@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "staging": "gossip-45b0d",
+    "default": "gossip-45b0d"
+  },
+  "targets": {},
+  "etags": {}
+}

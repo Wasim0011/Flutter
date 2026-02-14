@@ -1,0 +1,94 @@
+name: gossipcom
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.3.1
+
+  # 🔥 Updated Firebase (Fully Compatible)
+  firebase_core: ^3.8.0
+  firebase_auth: ^5.1.2
+  cloud_firestore: ^5.4.4
+  firebase_storage: ^12.2.0
+  firebase_database: ^11.0.15
+  firebase_messaging: ^15.1.3
+  firebase_app_check: ^0.3.0+1
+
+  google_sign_in: ^6.2.1
+  http: ^1.5.0
+  image_picker: ^1.2.0
+  provider: ^6.1.5+1
+  image_cropper: ^9.1.0
+  cached_network_image: ^3.4.1
+  timeago: ^3.7.1
+  url_launcher: ^6.3.2
+  visibility_detector: ^0.4.0+2
+  shared_preferences: ^2.5.3
+  shimmer: ^3.0.0
+  fluttertoast: ^8.2.12
+  flutter_launcher_icons: ^0.14.4
+  lottie: ^3.3.1
+  flutter_native_splash: ^2.4.6
+  circle_nav_bar: ^2.2.0
+  flutter_svg: ^2.2.1
+  flutter_screenutil: ^5.9.3
+  intl: ^0.20.2
+  flutter_confetti: ^0.5.1
+  flutter_local_notifications: ^17.2.1
+  share_plus: ^12.0.1
+  googleapis_auth: ^2.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon.png"
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/icon.png"
+    background_color: "#hexcode"
+    theme_color: "#hexcode"
+  windows:
+    generate: true
+    image_path: "assets/icon.png"
+    icon_size: 48
+  macos:
+    generate: true
+    image_path: "assets/icon.png"
+
+flutter:
+
+  uses-material-design: true
+
+  assets:
+    - assets/
+    - reg_assets/
+    - reg_topic_assets/
+    - reg_terms/
+    - onetoone_asset/
+    - matchmaking_asset/
+    - profile_assets/
+    - assets/animation/logo.json
+    - assets/service_account.json
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: assets/icon.png
+  android: true
+  ios: true
+  android_gravity: center
+  ios_content_mode: center
