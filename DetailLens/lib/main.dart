@@ -6,7 +6,7 @@ import 'core/app_export.dart';
 var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  // 🚨 CRITICAL: Device orientation lock - DO NOT REMOVE
+  // CRITICAL: Device orientation lock - DO NOT REMOVE
   Future.wait([
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]),
   ]).then((value) {
@@ -22,7 +22,7 @@ class MyApp extends ConsumerWidget {
         return MaterialApp(
           theme: theme,
           title: 'Product Info Extractor',
-          // 🚨 CRITICAL: NEVER REMOVE OR MODIFY
+          // CRITICAL: NEVER REMOVE OR MODIFY
           builder: (context, child) {
             return MediaQuery(
               data: MediaQuery.of(
@@ -31,7 +31,7 @@ class MyApp extends ConsumerWidget {
               child: child!,
             );
           },
-          // 🚨 END CRITICAL SECTION
+          // END CRITICAL SECTION
           navigatorKey: NavigatorService.navigatorKey,
           debugShowCheckedModeBanner: false,
           localizationsDelegates: [
