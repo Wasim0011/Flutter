@@ -9,3 +9,4 @@
 /.idea/.wiseGPT/
 /ios/Podfile
 /pubspec.lock
+/lib/data/api_key.dart
