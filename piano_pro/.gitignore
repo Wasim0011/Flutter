@@ -1,0 +1,76 @@
+# ----------------------------------------------------------------------------
+# Flutter/Dart
+# ----------------------------------------------------------------------------
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+coverage/
+
+# ----------------------------------------------------------------------------
+# Android - Native & Signing (Critical for Security)
+# ----------------------------------------------------------------------------
+**/android/app/debug
+**/android/app/profile
+**/android/app/release
+**/android/local.properties
+**/android/key.properties
+**/android/app/*.keystore
+**/android/app/*.jks
+**/android/app/*.p12
+*.token
+.externalNativeBuild/
+.cxx/
+
+# ----------------------------------------------------------------------------
+# iOS/macOS - CocoaPods & Build
+# ----------------------------------------------------------------------------
+**/ios/Flutter/.last_build_id
+**/ios/Pods/
+**/ios/Frameworks/
+**/macos/Pods/
+**/macos/Flutter/ephemeral/
+.last_build_id
+*.xcworkspace
+xcuserdata/
+
+# ----------------------------------------------------------------------------
+# IDEs & Editors
+# ----------------------------------------------------------------------------
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.history
+*.swp
+*~
+
+# ----------------------------------------------------------------------------
+# OS Specific
+# ----------------------------------------------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+Thumbs.db
+ehthumbs.db
+
+# ----------------------------------------------------------------------------
+# Environment & Secrets
+# ----------------------------------------------------------------------------
+.env
+.env.*
+secrets.json
+
+# ----------------------------------------------------------------------------
+# Miscellaneous
+# ----------------------------------------------------------------------------
+*.class
+*.log
+*.pyc
+doc/api/
+app.*.symbols
+app.*.map.json
