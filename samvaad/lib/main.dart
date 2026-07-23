@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 
 void main() {
@@ -11,49 +12,13 @@ class SamvaadApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Samvaad',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: ThemeMode.system,
-      home: const _FoundationPlaceholder(),
-    );
-  }
-}
-
-class _FoundationPlaceholder extends StatelessWidget {
-  const _FoundationPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Icon(
-                Icons.forum_rounded,
-                size: 64,
-                color: theme.colorScheme.primary,
-              ),
-              const SizedBox(height: 16),
-              Text('Samvaad', style: theme.textTheme.headlineMedium),
-              const SizedBox(height: 8),
-              Text(
-                'Foundation build — theming active',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      ),
+      routerConfig: appRouter,
     );
   }
 }

@@ -10,16 +10,13 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-
-  # --- Models / codegen ---
   freezed_annotation: ^2.4.4
+  go_router: ^15.1.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
-
-  # --- Codegen tooling ---
   build_runner: ^2.4.15
   freezed: ^2.5.8
 
