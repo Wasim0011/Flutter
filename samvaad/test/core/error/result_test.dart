@@ -35,13 +35,17 @@ void main() {
 
       final String output = result.fold(
         onSuccess: (data) => 'got $data',
-        onFailure: (failure) => failure.when(
-          network: (m) => 'network: $m',
-          authentication: (m) => 'auth: $m',
-          permission: (m) => 'permission: $m',
-          validation: (m) => 'validation: $m',
-          unexpected: (m) => 'unexpected: $m',
-        ),
+        // Freezed 3.x no longer generates .when()/.map() on unions —
+        // Dart's native switch pattern matching replaces it, and is
+        // the idiomatic approach going forward (exhaustiveness is
+        // still compiler-checked, same guarantee as before).
+        onFailure: (failure) => switch (failure) {
+          NetworkFailure(:final message) => 'network: $message',
+          AuthenticationFailure(:final message) => 'auth: $message',
+          PermissionFailure(:final message) => 'permission: $message',
+          ValidationFailure(:final message) => 'validation: $message',
+          UnexpectedFailure(:final message) => 'unexpected: $message',
+        },
       );
 
       expect(output, 'validation: empty field');
