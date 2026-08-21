@@ -7,16 +7,42 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:piano_pro/main.dart';
+import 'package:piano_pro/src/features/piano/data/audio_service.dart';
+import 'package:piano_pro/src/features/piano/domain/note_model.dart';
+
+class FakeAudioService implements AudioService {
+  @override
+  Future<void> initialize() async {}
+  @override
+  Future<void> preloadNotes(List<NoteModel> notes) async {}
+  @override
+  void setVolume(double v) {}
+  @override
+  void setSustain(bool on) {}
+  @override
+  Future<void> playNote(NoteModel note) async {}
+  @override
+  Future<void> stopNote(NoteModel note) async {}
+  @override
+  void dispose() {}
+}
 
 void main() {
   testWidgets('Piano app smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const ProviderScope(child: PianoApp()));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          audioServiceProvider.overrideWithValue(FakeAudioService()),
+        ],
+        child: const PianoApp(),
+      ),
+    );
 
-    // Verify that the app starts.
+    // Verify that the app starts and displays the piano screen.
     expect(find.byType(MaterialApp), findsOneWidget);
+    // You can add more specific checks here, like finding a key
   });
 }
