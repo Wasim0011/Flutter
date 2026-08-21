@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart'; // StateProvider, StateNotifier, StateNotifierProvider
 import '../../data/audio_service.dart';
 import '../../domain/note_model.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 // ── Piano config (base range — octave shift applied on top) ───────────────────
 
@@ -35,53 +35,39 @@ StateNotifierProvider<PressedNotesNotifier, Set<int>>(
 class PressedNotesNotifier extends StateNotifier<Set<int>> {
   PressedNotesNotifier() : super({});
 
-  void press(int midi)   => state = {...state, midi};
-  void release(int midi) => state = state.difference({midi});
+  void press(int midi)     => state = {...state, midi};
+  void release(int midi)   => state = state.difference({midi});
   bool isPressed(int midi) => state.contains(midi);
 
   /// Release everything (e.g. when octave shifts mid-play).
   void releaseAll() => state = {};
 }
 
-// ── Sustain ───────────────────────────────────────────────────────────────────
+// ── Sustain (UI state only — audio engine called via PianoController) ─────────
 
 final sustainProvider = StateProvider<bool>((ref) => false);
 
-// Wires sustain state → AudioService
-final _sustainWatcherProvider = Provider<void>((ref) {
-  final on = ref.watch(sustainProvider);
-  ref.read(audioServiceProvider).setSustain(on);
-});
-
-// ── Volume ────────────────────────────────────────────────────────────────────
+// ── Volume (UI state only — audio engine called via PianoController) ──────────
 
 final volumeProvider = StateProvider<double>((ref) => 0.85);
-
-// Wires volume state → AudioService
-final _volumeWatcherProvider = Provider<void>((ref) {
-  final v = ref.watch(volumeProvider);
-  ref.read(audioServiceProvider).setVolume(v);
-});
 
 // ── Piano controller ──────────────────────────────────────────────────────────
 
 final pianoControllerProvider = Provider<PianoController>(PianoController.new);
 
 class PianoController {
-  PianoController(this._ref) {
-    // Kick off the watchers so they're alive for the app lifetime
-    _ref.read(_sustainWatcherProvider);
-    _ref.read(_volumeWatcherProvider);
-  }
+  PianoController(this._ref);
 
   final Ref _ref;
 
-  AudioService get _audio   => _ref.read(audioServiceProvider);
+  AudioService get _audio => _ref.read(audioServiceProvider);
   PressedNotesNotifier get _pressed =>
       _ref.read(pressedNotesProvider.notifier);
 
   Future<void> initialize() async {
     await _audio.initialize();
+    // Sync initial volume to audio engine
+    _audio.setVolume(_ref.read(volumeProvider));
     final notes = _ref.read(allNotesProvider);
     await _audio.preloadNotes(notes);
   }
@@ -91,6 +77,21 @@ class PianoController {
     _pressed.releaseAll();
     final notes = _ref.read(allNotesProvider);
     await _audio.preloadNotes(notes);
+  }
+
+  /// Toggle sustain — updates BOTH Riverpod state AND the audio engine.
+  /// This is the ONLY correct way to change sustain; never write sustainProvider
+  /// directly from the UI.
+  void toggleSustain() {
+    final next = !_ref.read(sustainProvider);
+    _ref.read(sustainProvider.notifier).state = next;
+    _audio.setSustain(next); // ← the actual audio engine call
+  }
+
+  /// Set volume — updates BOTH Riverpod state AND the audio engine.
+  void setVolume(double v) {
+    _ref.read(volumeProvider.notifier).state = v;
+    _audio.setVolume(v); // ← the actual audio engine call
   }
 
   void onNoteDown(NoteModel note) {

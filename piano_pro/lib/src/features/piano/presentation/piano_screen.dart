@@ -2,7 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/legacy.dart'; // StateProvider
 
 import '../../../core/constants/colors.dart';
 import '../data/audio_service.dart';
@@ -178,9 +178,10 @@ class _TopBar extends ConsumerWidget {
           const SizedBox(width: 16),
 
           // ── Sustain toggle ────────────────────────────────────────────────
-          _SustainButton(active: sustain,
-              onTap: () =>
-              ref.read(sustainProvider.notifier).state = !sustain),
+          _SustainButton(
+            active: sustain,
+            onTap: () => ref.read(pianoControllerProvider).toggleSustain(),
+          ),
 
           const SizedBox(width: 16),
           _Divider(),
@@ -770,10 +771,7 @@ class _BottomBar extends ConsumerWidget {
                 value: volume,
                 min: 0,
                 max: 1,
-                onChanged: (v) {
-                  ref.read(volumeProvider.notifier).state = v;
-                  ref.read(audioServiceProvider).setVolume(v);
-                },
+                onChanged: (v) => ref.read(pianoControllerProvider).setVolume(v),
               ),
             ),
           ),

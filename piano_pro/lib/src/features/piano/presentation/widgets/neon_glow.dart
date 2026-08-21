@@ -28,17 +28,17 @@ class NeonGlow extends StatelessWidget {
         borderRadius: BorderRadius.circular(borderRadius + 2),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.08 * intensity),
+            color: color.withValues(alpha: 0.08 * intensity),
             blurRadius: 40,
             spreadRadius: 12,
           ),
           BoxShadow(
-            color: color.withOpacity(0.20 * intensity),
+            color: color.withValues(alpha: 0.20 * intensity),
             blurRadius: 18,
             spreadRadius: 4,
           ),
           BoxShadow(
-            color: color.withOpacity(0.50 * intensity),
+            color: color.withValues(alpha: 0.50 * intensity),
             blurRadius: 7,
             spreadRadius: 0,
           ),
@@ -171,7 +171,7 @@ class _KeyRippleState extends State<KeyRipple>
             child: Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: widget.color.withOpacity(_opacity.value),
+                color: widget.color.withValues(alpha: _opacity.value),
               ),
             ),
           ),

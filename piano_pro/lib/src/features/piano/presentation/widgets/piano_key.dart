@@ -138,20 +138,20 @@ class _WhitePianoKeyState extends ConsumerState<WhitePianoKey>
                             ? [
                           // Inset-style: top dark line when depressed
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.35),
+                            color: Colors.black.withValues(alpha: 0.35),
                             offset: const Offset(0, -2),
                             blurRadius: 4,
                           ),
                         ]
                             : [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.45),
+                            color: Colors.black.withValues(alpha: 0.45),
                             offset: const Offset(0, 3),
                             blurRadius: 5,
                             spreadRadius: 0,
                           ),
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.20),
+                            color: Colors.black.withValues(alpha: 0.20),
                             offset: const Offset(1, 0),
                             blurRadius: 2,
                           ),
@@ -174,9 +174,9 @@ class _WhitePianoKeyState extends ConsumerState<WhitePianoKey>
                                   begin: Alignment.topCenter,
                                   end:   Alignment.bottomCenter,
                                   colors: [
-                                    Colors.white.withOpacity(
-                                        isPressed ? 0.0 : 0.55),
-                                    Colors.white.withOpacity(0.0),
+                                    Colors.white.withValues(
+                                        alpha: isPressed ? 0.0 : 0.55),
+                                    Colors.white.withValues(alpha: 0.0),
                                   ],
                                 ),
                               ),
@@ -197,8 +197,8 @@ class _WhitePianoKeyState extends ConsumerState<WhitePianoKey>
                                       begin: Alignment.topCenter,
                                       end:   Alignment.bottomCenter,
                                       colors: [
-                                        AppColors.glowAmber.withOpacity(0.22),
-                                        AppColors.glowAmber.withOpacity(0.04),
+                                        AppColors.glowAmber.withValues(alpha: 0.22),
+                                        AppColors.glowAmber.withValues(alpha: 0.04),
                                       ],
                                     ),
                                   ),
@@ -381,14 +381,14 @@ class _BlackPianoKeyState extends ConsumerState<BlackPianoKey>
                         boxShadow: isPressed
                             ? [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.9),
+                            color: Colors.black.withValues(alpha: 0.9),
                             offset: const Offset(0, 1),
                             blurRadius: 3,
                           ),
                         ]
                             : [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.85),
+                            color: Colors.black.withValues(alpha: 0.85),
                             offset: const Offset(0, 5),
                             blurRadius: 10,
                             spreadRadius: 2,
@@ -424,9 +424,9 @@ class _BlackPianoKeyState extends ConsumerState<BlackPianoKey>
                                   begin: Alignment.topCenter,
                                   end:   Alignment.bottomCenter,
                                   colors: [
-                                    Colors.white.withOpacity(
-                                        isPressed ? 0.0 : 0.18),
-                                    Colors.white.withOpacity(0.0),
+                                    Colors.white.withValues(
+                                        alpha: isPressed ? 0.0 : 0.18),
+                                    Colors.white.withValues(alpha: 0.0),
                                   ],
                                 ),
                               ),
@@ -447,8 +447,8 @@ class _BlackPianoKeyState extends ConsumerState<BlackPianoKey>
                                       begin: Alignment.topCenter,
                                       end:   Alignment.bottomCenter,
                                       colors: [
-                                        AppColors.glowCyan.withOpacity(0.28),
-                                        AppColors.glowCyan.withOpacity(0.05),
+                                        AppColors.glowCyan.withValues(alpha: 0.28),
+                                        AppColors.glowCyan.withValues(alpha: 0.05),
                                       ],
                                     ),
                                   ),
