@@ -21,6 +21,15 @@ const double _bottomBarH     = 52.0;
 const double _minimapH       = 28.0;
 
 // ─────────────────────────────────────────────────────────────────────────────
+//  Scroll controller — shared so BottomBar can trigger scroll-to-home
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Holds the ONE scroll controller for the keyboard.
+// _PianoBodyState registers it; _BottomBar reads it.
+final _keyboardScrollProvider =
+StateProvider<ScrollController?>((ref) => null);
+
+// ─────────────────────────────────────────────────────────────────────────────
 //  Root screen
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -404,7 +413,20 @@ class _PianoBodyState extends ConsumerState<_PianoBody> {
   final ScrollController _scroll = ScrollController();
 
   @override
+  void initState() {
+    super.initState();
+    // Register so BottomBar's HOME button can animate to middle C
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(_keyboardScrollProvider.notifier).state = _scroll;
+      }
+    });
+  }
+
+  @override
   void dispose() {
+    // Unregister before disposing
+    ref.read(_keyboardScrollProvider.notifier).state = null;
     _scroll.dispose();
     super.dispose();
   }
@@ -794,23 +816,134 @@ class _BottomBar extends ConsumerWidget {
 
           const SizedBox(width: 20),
 
-          // ── Scroll hint ────────────────────────────────────────────────
-          Row(
+          // ── Home button — scrolls keyboard to Middle C (C4) ──────────────
+          _HomeButton(),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Home button — snaps keyboard scroll back to Middle C (C4)
+//
+//  WHY THIS EXISTS:
+//  A real piano has 88 keys. Your screen shows ~2 octaves at a time.
+//  After exploring bass or treble, one tap brings you back to Middle C —
+//  the "home base" of every pianist. Top apps (Simply Piano, Perfect Piano)
+//  all have this.
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _HomeButton extends ConsumerStatefulWidget {
+  @override
+  ConsumerState<_HomeButton> createState() => _HomeButtonState();
+}
+
+class _HomeButtonState extends ConsumerState<_HomeButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _pulse;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulse = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+      lowerBound: 0.9,
+      upperBound: 1.0,
+      value: 1.0,
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  void _scrollToMiddleC() {
+    final controller = ref.read(_keyboardScrollProvider);
+    if (controller == null || !controller.hasClients) return;
+
+    final notes      = ref.read(allNotesProvider);
+    final whiteNotes = notes.where((n) => !n.isSharp).toList();
+
+    // Find C4 (Middle C) index among white keys.
+    // We want C4 to appear at the LEFT edge of the visible viewport
+    // (not centred), because that's how real pianos look — you can see
+    // the bass to the left in the minimap, and the treble extends right.
+    // If C4 is not in range, go to the note closest to MIDI 60.
+    int targetIndex = whiteNotes.indexWhere(
+            (n) => n.name == 'C' && n.octave == 4);
+
+    if (targetIndex < 0) {
+      // C4 not in range — find the white key closest to MIDI 60 (C4)
+      int closest = 0;
+      int minDist = 999;
+      for (int i = 0; i < whiteNotes.length; i++) {
+        final dist = (whiteNotes[i].midiNumber - 60).abs();
+        if (dist < minDist) { minDist = dist; closest = i; }
+      }
+      targetIndex = closest;
+    }
+
+    final stride  = _whiteKeyWidth + _whiteKeyMargin * 2;
+
+    // Position C4 at 25% from the left of the viewport —
+    // this feels most natural: you see 1/4 bass keys to the left,
+    // and 3/4 treble keys to the right, matching a real seated pianist's view.
+    final vpWidth = controller.position.viewportDimension;
+    final targetPx = targetIndex * stride;
+    final scrollTo = (targetPx - vpWidth * 0.25)
+        .clamp(0.0, controller.position.maxScrollExtent);
+
+    controller.animateTo(
+      scrollTo,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOutCubic,
+    );
+
+    // Press animation + haptic
+    _pulse.reverse().then((_) => _pulse.forward());
+    HapticFeedback.lightImpact();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _scrollToMiddleC,
+      child: ScaleTransition(
+        scale: _pulse,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceHigh,
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: AppColors.panelBorder),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.glowAmber.withOpacity(0.08),
+                blurRadius: 8,
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: const [
-              Icon(Icons.swipe_rounded,
-                  color: AppColors.textMuted, size: 14),
-              SizedBox(width: 4),
+              Icon(Icons.home_rounded, color: AppColors.glowAmber, size: 14),
+              SizedBox(width: 6),
               Text(
-                'SWIPE KEYS',
+                'MIDDLE C',
                 style: TextStyle(
-                  color: AppColors.textMuted,
+                  color: AppColors.glowAmber,
                   fontSize: 9,
-                  letterSpacing: 1.5,
+                  letterSpacing: 1.8,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
