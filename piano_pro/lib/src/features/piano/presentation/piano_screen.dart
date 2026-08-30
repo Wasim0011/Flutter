@@ -5,17 +5,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart'; // StateProvider
 
 import '../../../core/constants/colors.dart';
-import '../data/audio_service.dart';
 import '../domain/note_model.dart';
 import 'providers/piano_provider.dart';
-import 'widgets/piano_key.dart';
+import 'widgets/neon_glow.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-const double _whiteKeyWidth  = 52.0;
-const double _whiteKeyMargin = 1.5;  // gap between white keys
+// Fixed key width — good tap target, never changes regardless of screen size.
+// Keyboard is always scrollable; starts centred on Middle C.
+const double _whiteKeyWidth  = 52.0;  // proven comfortable tap target
+const double _whiteKeyMargin = 1.2;   // gap on each side of a white key
 const double _topBarH        = 50.0;
 const double _bottomBarH     = 52.0;
 const double _minimapH       = 28.0;
@@ -70,6 +71,10 @@ class _PianoScreenState extends ConsumerState<PianoScreen> {
       child: Scaffold(
         backgroundColor: AppColors.background,
         body: SafeArea(
+          // Left/right edge-to-edge — keyboard and minimap fill full width.
+          // Top/bottom safe insets still respected for notches and nav bars.
+          left: false,
+          right: false,
           child: Column(
             children: [
               _TopBar(),
@@ -412,13 +417,30 @@ class _PianoBody extends ConsumerStatefulWidget {
 class _PianoBodyState extends ConsumerState<_PianoBody> {
   final ScrollController _scroll = ScrollController();
 
+  bool _initialScrollDone = false;
+
   @override
   void initState() {
     super.initState();
-    // Register so BottomBar's HOME button can animate to middle C
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        ref.read(_keyboardScrollProvider.notifier).state = _scroll;
+      if (!mounted) return;
+      // Register scroll controller for HOME button
+      ref.read(_keyboardScrollProvider.notifier).state = _scroll;
+
+      // Auto-scroll to Middle C on first open
+      if (!_initialScrollDone && _scroll.hasClients) {
+        _initialScrollDone = true;
+        final notes      = ref.read(allNotesProvider);
+        final whiteNotes = notes.where((n) => !n.isSharp).toList();
+        final c4Index    = whiteNotes.indexWhere(
+                (n) => n.name == 'C' && n.octave == 4);
+        if (c4Index >= 0) {
+          const slotW   = _whiteKeyWidth + _whiteKeyMargin * 2;
+          final vpWidth = _scroll.position.viewportDimension;
+          final target  = (c4Index * slotW - vpWidth * 0.25)
+              .clamp(0.0, _scroll.position.maxScrollExtent);
+          _scroll.jumpTo(target);   // instant on open, no animation
+        }
       }
     });
   }
@@ -437,13 +459,20 @@ class _PianoBodyState extends ConsumerState<_PianoBody> {
     final whiteNotes = notes.where((n) => !n.isSharp).toList();
     final blackNotes = notes.where((n) => n.isSharp).toList();
 
-    final totalWhite = whiteNotes.length;
-    final totalWidth = totalWhite * (_whiteKeyWidth + _whiteKeyMargin * 2);
-
     return LayoutBuilder(builder: (context, box) {
-      final keyH   = box.maxHeight * 0.92;
-      final bkW    = _whiteKeyWidth * 0.64;
-      final bkH    = keyH * 0.615;
+      final totalWhite = whiteNotes.length;
+
+      // ── Fixed key width — keyboard always scrolls ──────────────────────────
+      // Keys stay at a comfortable 52px. Total content is wider than any phone
+      // screen, so we always scroll. No squishing, no gaps.
+      const double keyW    = _whiteKeyWidth;
+      const double margin  = _whiteKeyMargin;
+      final double slotW   = keyW + margin * 2;
+      final double totalWidth = totalWhite * slotW;
+
+      final double keyH = box.maxHeight * 0.92;
+      final double bkW  = keyW * 0.62;
+      final double bkH  = keyH * 0.615;
 
       // Map white-key midi → horizontal index
       final whiteIdx = <int, int>{};
@@ -451,85 +480,670 @@ class _PianoBodyState extends ConsumerState<_PianoBody> {
         whiteIdx[whiteNotes[i].midiNumber] = i;
       }
 
-      // Notify minimap of scroll position
+      final keyboard = _MultiTouchKeyboard(
+        notes: notes,
+        whiteNotes: whiteNotes,
+        blackNotes: blackNotes,
+        whiteIdx: whiteIdx,
+        keyW: keyW,
+        keyH: keyH,
+        bkW: bkW,
+        bkH: bkH,
+        totalWidth: totalWidth,
+        scrollController: _scroll,
+      );
+
+      // Push dimensions to minimap on every build
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        ref.read(_viewportWidthProvider.notifier).state = box.maxWidth;
+        ref.read(_contentWidthProvider.notifier).state  = totalWidth;
+        ref.read(_scrollMaxProvider.notifier).state =
+            math.max(0, totalWidth - box.maxWidth);
+        ref.read(_scrollOffsetProvider.notifier).state =
+        _scroll.hasClients ? _scroll.offset : 0;
+      });
+
+      // Notify minimap on scroll events
       return NotificationListener<ScrollNotification>(
         onNotification: (n) {
           ref.read(_scrollOffsetProvider.notifier).state =
           _scroll.hasClients ? _scroll.offset : 0;
           ref.read(_scrollMaxProvider.notifier).state =
-          _scroll.hasClients
-              ? math.max(0, totalWidth - box.maxWidth)
-              : 1;
+              math.max(0, totalWidth - box.maxWidth);
           ref.read(_viewportWidthProvider.notifier).state = box.maxWidth;
           ref.read(_contentWidthProvider.notifier).state  = totalWidth;
           return false;
         },
         child: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end:   Alignment.bottomCenter,
               colors: [AppColors.surface, AppColors.background],
-              stops: const [0.0, 0.6],
+              stops: [0.0, 0.6],
             ),
           ),
           child: SingleChildScrollView(
             controller: _scroll,
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
-            child: SizedBox(
-              width: totalWidth,
-              child: Stack(
-                children: [
-                  // Wood rail
-                  Positioned(
-                    top: 0, left: 0, right: 0, height: 20,
-                    child: const _WoodRail(),
-                  ),
-
-                  // White keys
-                  Positioned(
-                    top: 18, left: 0, right: 0,
-                    child: Row(
-                      children: whiteNotes
-                          .map((n) => WhitePianoKey(
-                        note: n,
-                        width: _whiteKeyWidth,
-                        height: keyH,
-                      ))
-                          .toList(),
-                    ),
-                  ),
-
-                  // Black keys
-                  for (final note in blackNotes)
-                    _positionedBlackKey(
-                        note, whiteIdx, bkW, bkH),
-                ],
-              ),
-            ),
+            child: SizedBox(width: totalWidth, child: keyboard),
           ),
         ),
       );
     });
   }
 
-  Widget _positionedBlackKey(
-      NoteModel note,
-      Map<int, int> whiteIdx,
-      double bkW,
-      double bkH,
-      ) {
-    final prevIdx = whiteIdx[note.midiNumber - 1];
-    if (prevIdx == null) return const SizedBox.shrink();
+}
 
-    final stride = _whiteKeyWidth + _whiteKeyMargin * 2;
-    final left   = prevIdx * stride + stride - bkW / 2 + _whiteKeyMargin;
+// ─────────────────────────────────────────────────────────────────────────────
+//  Multi-touch keyboard
+//
+//  HOW IT WORKS:
+//  Instead of each key having its own Listener (which only catches the initial
+//  pointer-down on that key), we put ONE Listener over the whole keyboard Stack.
+//  We track every active pointer ID → which NoteModel it is pressing.
+//  When a pointer moves between keys, we detect that and fire note-off on the
+//  old key + note-on on the new key. This gives slide-to-play behaviour AND
+//  true multi-finger polyphony (up to 10 simultaneous fingers).
+// ─────────────────────────────────────────────────────────────────────────────
 
-    return Positioned(
-      top: 18,
-      left: left,
-      child: BlackPianoKey(note: note, width: bkW, height: bkH),
+class _MultiTouchKeyboard extends ConsumerStatefulWidget {
+  const _MultiTouchKeyboard({
+    required this.notes,
+    required this.whiteNotes,
+    required this.blackNotes,
+    required this.whiteIdx,
+    required this.keyW,
+    required this.keyH,
+    required this.bkW,
+    required this.bkH,
+    required this.totalWidth,
+    this.scrollController,
+  });
+
+  final List<NoteModel> notes;
+  final List<NoteModel> whiteNotes;
+  final List<NoteModel> blackNotes;
+  final Map<int, int> whiteIdx;
+  final double keyW;
+  final double keyH;
+  final double bkW;
+  final double bkH;
+  final double totalWidth;
+  /// Non-null when the keyboard is inside a ScrollView.
+  /// Used to detect scroll-vs-play intent.
+  final ScrollController? scrollController;
+
+  @override
+  ConsumerState<_MultiTouchKeyboard> createState() =>
+      _MultiTouchKeyboardState();
+}
+
+class _MultiTouchKeyboardState extends ConsumerState<_MultiTouchKeyboard> {
+  // Maps pointer ID → the note it is currently pressing
+  final Map<int, NoteModel> _activePointers = {};
+
+  // Tracks the initial DOWN position per pointer to decide scroll vs play.
+  final Map<int, Offset> _downPositions = {};
+
+  // Pointers that have been classified as "scrolling" — ignore for notes.
+  final Set<int> _scrollingPointers = {};
+
+  // How many pixels of horizontal movement before we call it a scroll.
+  static const double _scrollThreshold = 6.0;
+  // Play intent requires less vertical movement than horizontal.
+  static const double _playThreshold   = 10.0;
+
+  // ── Hit-testing ────────────────────────────────────────────────────────────
+
+  NoteModel? _noteAt(Offset local) {
+    final stride = widget.keyW + _whiteKeyMargin * 2;
+
+    // Black keys first — they sit visually on top
+    if (local.dy >= 18 && local.dy <= 18 + widget.bkH) {
+      for (final note in widget.blackNotes) {
+        final prevIdx = widget.whiteIdx[note.midiNumber - 1];
+        if (prevIdx == null) continue;
+        final left = prevIdx * stride + stride - widget.bkW / 2;
+        if (local.dx >= left && local.dx <= left + widget.bkW) {
+          return note;
+        }
+      }
+    }
+
+    // White keys
+    if (local.dy >= 18) {
+      final idx = (local.dx / stride).floor();
+      if (idx >= 0 && idx < widget.whiteNotes.length) {
+        return widget.whiteNotes[idx];
+      }
+    }
+    return null;
+  }
+
+  // ── Pointer handlers ───────────────────────────────────────────────────────
+
+  void _onPointerDown(PointerDownEvent e) {
+    _downPositions[e.pointer] = e.localPosition;
+    // Don't play immediately — wait for move/up to classify intent.
+    // This prevents accidental notes when the finger is just resting.
+    // We do play on the UP if no significant movement happened.
+  }
+
+  void _onPointerMove(PointerMoveEvent e) {
+    // Already classified as scroll — let ScrollView handle it
+    if (_scrollingPointers.contains(e.pointer)) return;
+
+    final down = _downPositions[e.pointer];
+    if (down == null) return;
+
+    final dx = (e.localPosition.dx - down.dx).abs();
+    final dy = (e.localPosition.dy - down.dy).abs();
+
+    // If this pointer hasn't been committed to a note yet and moves
+    // significantly horizontally → it's a scroll, not a key press.
+    if (!_activePointers.containsKey(e.pointer)) {
+      if (widget.scrollController != null && dx > _scrollThreshold && dx > dy) {
+        // Classify as scroll
+        _scrollingPointers.add(e.pointer);
+        return;
+      }
+      // Moved enough vertically OR stayed still — commit as a note press
+      if (dy > _playThreshold || dx > _playThreshold) {
+        final note = _noteAt(e.localPosition);
+        if (note != null) {
+          _activePointers[e.pointer] = note;
+          ref.read(pianoControllerProvider).onNoteDown(note);
+        }
+      }
+      return;
+    }
+
+    // Already committed to a note — handle slide-to-play
+    final newNote = _noteAt(e.localPosition);
+    final oldNote = _activePointers[e.pointer];
+    if (newNote == oldNote) return;
+
+    if (oldNote != null) {
+      ref.read(pianoControllerProvider).onNoteUp(oldNote);
+    }
+    if (newNote != null) {
+      _activePointers[e.pointer] = newNote;
+      ref.read(pianoControllerProvider).onNoteDown(newNote);
+    } else {
+      _activePointers.remove(e.pointer);
+    }
+  }
+
+  void _onPointerUp(PointerUpEvent e) {
+    final wasScrolling = _scrollingPointers.remove(e.pointer); // capture result
+    final down = _downPositions.remove(e.pointer);
+    final note = _activePointers.remove(e.pointer);
+
+    if (note != null) {
+      ref.read(pianoControllerProvider).onNoteUp(note);
+    } else if (!wasScrolling && down != null) {
+      // Only treat as tap if this pointer was NEVER classified as a scroll
+      final dx = (e.localPosition.dx - down.dx).abs();
+      final dy = (e.localPosition.dy - down.dy).abs();
+      if (dx < _scrollThreshold && dy < _scrollThreshold) {
+        final tapped = _noteAt(e.localPosition);
+        if (tapped != null) {
+          ref.read(pianoControllerProvider).onNoteDown(tapped);
+          Future.delayed(const Duration(milliseconds: 80), () {
+            ref.read(pianoControllerProvider).onNoteUp(tapped);
+          });
+        }
+      }
+    }
+  }
+
+  void _onPointerCancel(PointerCancelEvent e) {
+    _downPositions.remove(e.pointer);
+    _scrollingPointers.remove(e.pointer);
+    final note = _activePointers.remove(e.pointer);
+    if (note != null) {
+      ref.read(pianoControllerProvider).onNoteUp(note);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final stride = widget.keyW + _whiteKeyMargin * 2;
+
+    return Listener(
+      // HitTestBehavior.opaque so the Listener catches ALL touches on the
+      // keyboard area, not just ones that land directly on a painted pixel.
+      behavior: HitTestBehavior.opaque,
+      onPointerDown:   _onPointerDown,
+      onPointerMove:   _onPointerMove,
+      onPointerUp:     _onPointerUp,
+      onPointerCancel: _onPointerCancel,
+      child: Stack(
+        children: [
+          // Wood rail
+          const Positioned(
+            top: 0, left: 0, right: 0, height: 20,
+            child: _WoodRail(),
+          ),
+
+          // White keys (no individual Listeners — hit testing done above)
+          Positioned(
+            top: 18, left: 0, right: 0,
+            child: Row(
+              children: widget.whiteNotes.map((n) => _WhiteKeyVisual(
+                note: n,
+                width: stride,
+                height: widget.keyH,
+              )).toList(),
+            ),
+          ),
+
+          // Black keys
+          for (final note in widget.blackNotes)
+                () {
+              final prevIdx = widget.whiteIdx[note.midiNumber - 1];
+              if (prevIdx == null) return const SizedBox.shrink();
+              final left = prevIdx * stride + stride - widget.bkW / 2;
+              return Positioned(
+                top: 18,
+                left: left,
+                child: _BlackKeyVisual(
+                  note: note,
+                  width: widget.bkW,
+                  height: widget.bkH,
+                ),
+              );
+            }(),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Visual-only key widgets (no Listener — touch handled by _MultiTouchKeyboard)
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _WhiteKeyVisual extends ConsumerStatefulWidget {
+  const _WhiteKeyVisual({
+    required this.note,
+    required this.width,
+    required this.height,
+  });
+  final NoteModel note;
+  final double width;
+  final double height;
+
+  @override
+  ConsumerState<_WhiteKeyVisual> createState() => _WhiteKeyVisualState();
+}
+
+class _WhiteKeyVisualState extends ConsumerState<_WhiteKeyVisual>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _anim;
+  late final Animation<double> _press;
+  final int _prevTrigger = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _anim = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 50),
+      reverseDuration: const Duration(milliseconds: 200),
+    );
+    _press = CurvedAnimation(parent: _anim, curve: Curves.easeIn);
+  }
+
+  @override
+  void dispose() {
+    _anim.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isPressed = ref.watch(
+      pressedNotesProvider.select((s) => s.contains(widget.note.midiNumber)),
+    );
+
+    // Drive press animation from provider state
+    if (isPressed) {
+      _anim.forward();
+    } else {
+      _anim.reverse();
+    }
+
+    return AnimatedBuilder(
+      animation: _press,
+      builder: (_, __) {
+        final t = _press.value;
+        return SizedBox(
+          width: widget.width,
+          height: widget.height,
+          child: Stack(
+            children: [
+              // Shadow layer
+              Positioned(
+                left: 0, right: 0, top: 2 + t * 3, bottom: 0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(6),
+                      bottomRight: Radius.circular(6),
+                    ),
+                    color: AppColors.whiteKeyShadow,
+                  ),
+                ),
+              ),
+              // Key face
+              Positioned(
+                left: 0, right: 0, top: 0, bottom: t * 4,
+                child: PulsingGlow(
+                  isActive: isPressed,
+                  color: AppColors.glowAmber,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: _whiteKeyMargin),
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(6),
+                        bottomRight: Radius.circular(6),
+                      ),
+                      gradient: isPressed
+                          ? LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          AppColors.whiteKeyPressed,
+                          AppColors.whiteKeyPressedB,
+                          AppColors.whiteKeyShadow,
+                        ],
+                        stops: const [0.0, 0.65, 1.0],
+                      )
+                          : LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          AppColors.whiteKeyTop,
+                          AppColors.whiteKey,
+                          AppColors.whiteKeyBottom,
+                        ],
+                        stops: const [0.0, 0.7, 1.0],
+                      ),
+                      boxShadow: isPressed
+                          ? [BoxShadow(
+                        color: Colors.black.withOpacity(0.35),
+                        offset: const Offset(0, -2),
+                        blurRadius: 4,
+                      )]
+                          : [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.45),
+                          offset: const Offset(0, 3),
+                          blurRadius: 5,
+                        ),
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.20),
+                          offset: const Offset(1, 0),
+                          blurRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: Stack(
+                      clipBehavior: Clip.hardEdge,
+                      children: [
+                        // Gloss strip
+                        Positioned(
+                          top: 0, left: 2, right: 2, height: 18,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.only(
+                                bottomLeft: Radius.circular(3),
+                                bottomRight: Radius.circular(3),
+                              ),
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.white.withOpacity(isPressed ? 0.0 : 0.55),
+                                  Colors.white.withOpacity(0.0),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Amber pressed wash
+                        if (isPressed)
+                          Positioned.fill(
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                bottomLeft: Radius.circular(6),
+                                bottomRight: Radius.circular(6),
+                              ),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      AppColors.glowAmber.withOpacity(0.22),
+                                      AppColors.glowAmber.withOpacity(0.04),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        // Note label
+                        Positioned(
+                          bottom: 10, left: 0, right: 0,
+                          child: Text(
+                            widget.note.label,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.6,
+                              color: isPressed
+                                  ? AppColors.glowAmberB
+                                  : AppColors.textSecondary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _BlackKeyVisual extends ConsumerStatefulWidget {
+  const _BlackKeyVisual({
+    required this.note,
+    required this.width,
+    required this.height,
+  });
+  final NoteModel note;
+  final double width;
+  final double height;
+
+  @override
+  ConsumerState<_BlackKeyVisual> createState() => _BlackKeyVisualState();
+}
+
+class _BlackKeyVisualState extends ConsumerState<_BlackKeyVisual>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _anim;
+  late final Animation<double> _press;
+
+  @override
+  void initState() {
+    super.initState();
+    _anim = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 45),
+      reverseDuration: const Duration(milliseconds: 160),
+    );
+    _press = CurvedAnimation(parent: _anim, curve: Curves.easeIn);
+  }
+
+  @override
+  void dispose() {
+    _anim.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isPressed = ref.watch(
+      pressedNotesProvider.select((s) => s.contains(widget.note.midiNumber)),
+    );
+
+    if (isPressed) {
+      _anim.forward();
+    } else {
+      _anim.reverse();
+    }
+
+    return AnimatedBuilder(
+      animation: _press,
+      builder: (_, __) {
+        final t = _press.value;
+        return SizedBox(
+          width: widget.width,
+          height: widget.height,
+          child: Stack(
+            children: [
+              // Shadow base
+              Positioned(
+                left: 1, right: 1, top: 2 + t * 2, bottom: 0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(5),
+                      bottomRight: Radius.circular(5),
+                    ),
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+              // Key face
+              Positioned(
+                left: 0, right: 0, top: 0, bottom: t * 3,
+                child: NeonGlow(
+                  isActive: isPressed,
+                  color: AppColors.glowCyan,
+                  borderRadius: 5,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(5),
+                        bottomRight: Radius.circular(5),
+                      ),
+                      gradient: isPressed
+                          ? LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          AppColors.blackKeyPressed,
+                          AppColors.blackKeyPressedB,
+                          AppColors.blackKeyBase,
+                        ],
+                        stops: const [0.0, 0.5, 1.0],
+                      )
+                          : LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          AppColors.blackKeySheen,
+                          AppColors.blackKeyTop,
+                          AppColors.blackKeyMid,
+                          AppColors.blackKeyBase,
+                        ],
+                        stops: const [0.0, 0.08, 0.5, 1.0],
+                      ),
+                      boxShadow: isPressed
+                          ? [BoxShadow(
+                        color: Colors.black.withOpacity(0.9),
+                        offset: const Offset(0, 1),
+                        blurRadius: 3,
+                      )]
+                          : [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.85),
+                          offset: const Offset(0, 5),
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                        const BoxShadow(
+                          color: Color(0x28FFFFFF),
+                          offset: Offset(-1, 0),
+                          blurRadius: 1,
+                        ),
+                      ],
+                    ),
+                    child: Stack(
+                      clipBehavior: Clip.hardEdge,
+                      children: [
+                        // Gloss strip
+                        Positioned(
+                          top: 0, left: 3, right: 3, height: 12,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.only(
+                                bottomLeft: Radius.circular(3),
+                                bottomRight: Radius.circular(3),
+                              ),
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.white.withOpacity(isPressed ? 0.0 : 0.18),
+                                  Colors.white.withOpacity(0.0),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (isPressed)
+                          Positioned.fill(
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                bottomLeft: Radius.circular(5),
+                                bottomRight: Radius.circular(5),
+                              ),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      AppColors.glowCyan.withOpacity(0.28),
+                                      AppColors.glowCyan.withOpacity(0.05),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -626,7 +1240,9 @@ class _MinimapBar extends ConsumerWidget {
       height: _minimapH,
       color: AppColors.panelBg,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        // No horizontal padding — minimap keys must span edge-to-edge,
+        // identical to the wood rail and keyboard above/below it.
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
         child: LayoutBuilder(builder: (_, box) {
           final w        = box.maxWidth;
           final keyW     = w / totalWhite;
@@ -887,12 +1503,12 @@ class _HomeButtonState extends ConsumerState<_HomeButton>
       targetIndex = closest;
     }
 
-    final stride  = _whiteKeyWidth + _whiteKeyMargin * 2;
+    final vpWidth = controller.position.viewportDimension;
+    const stride  = _whiteKeyWidth + _whiteKeyMargin * 2;
 
     // Position C4 at 25% from the left of the viewport —
     // this feels most natural: you see 1/4 bass keys to the left,
     // and 3/4 treble keys to the right, matching a real seated pianist's view.
-    final vpWidth = controller.position.viewportDimension;
     final targetPx = targetIndex * stride;
     final scrollTo = (targetPx - vpWidth * 0.25)
         .clamp(0.0, controller.position.maxScrollExtent);

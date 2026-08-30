@@ -35,14 +35,17 @@ class AudioService {
   }
 
   Future<void> preloadNotes(List<NoteModel> notes) async {
-    for (final note in notes) {
-      try {
-        final source = await _soloud.loadAsset(note.assetPath);
-        _sources[note.midiNumber] = source;
-      } catch (e) {
-        debugPrint('AudioService: ${note.assetPath} missing — will pitch-shift.');
-      }
-    }
+    // Run all loads concurrently instead of sequentially
+    await Future.wait(
+      notes.map((note) async {
+        try {
+          final source = await _soloud.loadAsset(note.assetPath);
+          _sources[note.midiNumber] = source;
+        } catch (e) {
+          debugPrint('AudioService: ${note.assetPath} missing — will pitch-shift.');
+        }
+      }),
+    );
   }
 
   // ── Volume ──────────────────────────────────────────────────────────────────
