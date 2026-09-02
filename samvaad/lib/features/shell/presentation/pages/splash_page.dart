@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/providers/app_info_provider.dart';
+import '../../../../core/providers/firebase_status_provider.dart';
 
 /// Samvaad's entry screen.
 ///
-/// Milestone 5 converts this from StatelessWidget to ConsumerWidget and
-/// reads `appInfoProvider` — proving Riverpod DI is wired end-to-end
-/// from ProviderScope down to a real widget. Once Auth exists, this
-/// becomes the actual splash/bootstrapping screen that decides where to
-/// route the user next.
+/// Milestone 2.1 temporarily displays Firebase connectivity status here
+/// as proof-of-wiring — the same throwaway pattern used for
+/// `appInfoProvider` in Phase 1. Once real auth state exists
+/// (Milestone 2.6), this becomes the actual splash/routing-decision
+/// screen.
 class SplashPage extends ConsumerWidget {
   const SplashPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
-    final String appInfo = ref.watch(appInfoProvider);
+    final String status = ref.watch(firebaseStatusProvider);
 
     return Scaffold(
       body: Center(
@@ -33,7 +33,7 @@ class SplashPage extends ConsumerWidget {
               Text('Samvaad', style: theme.textTheme.headlineMedium),
               const SizedBox(height: 8),
               Text(
-                appInfo,
+                status,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
