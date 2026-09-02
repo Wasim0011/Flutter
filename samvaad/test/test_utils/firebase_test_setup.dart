@@ -4,27 +4,30 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// Shared Firebase mock initialization for widget/unit tests.
 ///
-/// `flutter test` runs every test file in one process, and Firebase
-/// only allows a single `[DEFAULT]` app to exist at a time. Centralizing
-/// setup here — guarded so it only runs once no matter how many test
-/// files call it — avoids both `duplicate-app` errors (calling this
-/// twice) and `no-app` errors (a test file that builds Firebase-dependent
-/// widgets without ever calling this at all).
-bool _initialized = false;
-
+/// `flutter test` can reuse process/isolate state across test files in
+/// ways that aren't fully visible from application code, so a locally
+/// tracked "already initialized" boolean isn't reliable here — it was
+/// still allowing a second `initializeApp` call through. Instead, we
+/// treat Firebase's own `duplicate-app` error as the authoritative
+/// signal that setup already happened, and simply continue: the
+/// existing `[DEFAULT]` app already carries the options this test
+/// suite expects, since every test file requests the identical
+/// FirebaseOptions below.
 Future<void> ensureFirebaseTestSetup() async {
   TestWidgetsFlutterBinding.ensureInitialized();
-
-  if (_initialized) return;
-  _initialized = true;
-
   setupFirebaseCoreMocks();
-  await Firebase.initializeApp(
-    options: const FirebaseOptions(
-      apiKey: 'test-api-key',
-      appId: 'test-app-id',
-      messagingSenderId: 'test-sender-id',
-      projectId: 'samvaad-test-project',
-    ),
-  );
+
+  try {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: 'test-api-key',
+        appId: 'test-app-id',
+        messagingSenderId: 'test-sender-id',
+        projectId: 'samvaad-test-project',
+      ),
+    );
+  } on FirebaseException catch (e) {
+    if (e.code != 'duplicate-app') rethrow;
+    // Already initialized elsewhere in this test run — safe to continue.
+  }
 }
