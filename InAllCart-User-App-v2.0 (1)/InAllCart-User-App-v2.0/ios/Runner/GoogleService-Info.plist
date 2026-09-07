@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  SETUP INSTRUCTIONS:
+  1. Go to https://console.firebase.google.com/
+  2. Open your Firebase project → Project Settings → Your apps
+  3. Add an iOS app with your Bundle ID (found in Xcode → Runner → General → Bundle Identifier)
+  4. Download the generated GoogleService-Info.plist and replace this file
+  5. Alternatively, run: flutterfire configure
+     See: https://firebase.flutter.dev/docs/cli/
+-->
+<plist version="1.0">
+<dict>
+  <key>API_KEY</key>
+  <string>YOUR_IOS_FIREBASE_API_KEY</string>
+  <key>GCM_SENDER_ID</key>
+  <string>YOUR_PROJECT_NUMBER</string>
+  <key>PLIST_VERSION</key>
+  <string>1</string>
+  <key>BUNDLE_ID</key>
+  <string>com.your.bundle.id</string>
+  <key>PROJECT_ID</key>
+  <string>YOUR_PROJECT_ID</string>
+  <key>STORAGE_BUCKET</key>
+  <string>YOUR_PROJECT_ID.firebasestorage.app</string>
+  <key>IS_ADS_ENABLED</key>
+  <false/>
+  <key>IS_ANALYTICS_ENABLED</key>
+  <false/>
+  <key>IS_APPINVITE_ENABLED</key>
+  <true/>
+  <key>IS_GCM_ENABLED</key>
+  <true/>
+  <key>IS_SIGNIN_ENABLED</key>
+  <true/>
+  <key>GOOGLE_APP_ID</key>
+  <string>YOUR_IOS_GOOGLE_APP_ID</string>
+  <key>DATABASE_URL</key>
+  <string>https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>

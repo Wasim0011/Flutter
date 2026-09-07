@@ -1,0 +1,4 @@
+<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- A gift box representing rewards -->
+  <path d="M20 12V21C20 21.5523 19.5523 22 19 22H5C4.44772 22 4 21.5523 4 21V12M20 7H4C3.44772 7 3 7.44772 3 8V11C3 11.5523 3.44772 12 4 12H20C20.5523 12 21 11.5523 21 11V8C21 7.44772 20.5523 7 20 7ZM12 22V7M12 7H16.5C18.433 7 20 5.433 20 3.5C20 1.567 18.433 0 16.5 0C14.567 0 12 2.5 12 4.5V7ZM12 7H7.5C5.567 7 4 5.433 4 3.5C4 1.567 5.567 0 7.5 0C9.433 0 12 2.5 12 4.5V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
