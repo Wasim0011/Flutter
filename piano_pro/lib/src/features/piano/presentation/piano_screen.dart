@@ -280,7 +280,7 @@ class _StepBtn extends StatelessWidget {
           border: Border.all(
             color: enabled
                 ? AppColors.panelBorder
-                : AppColors.textMuted.withOpacity(0.3),
+                : AppColors.textMuted.withValues(alpha: 0.3),
           ),
         ),
         child: Icon(
@@ -310,7 +310,7 @@ class _SustainButton extends StatelessWidget {
         const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
           color: active
-              ? AppColors.glowAmber.withOpacity(0.18)
+              ? AppColors.glowAmber.withValues(alpha: 0.18)
               : AppColors.surfaceHigh,
           borderRadius: BorderRadius.circular(5),
           border: Border.all(
@@ -320,7 +320,7 @@ class _SustainButton extends StatelessWidget {
           boxShadow: active
               ? [
             BoxShadow(
-              color: AppColors.glowAmber.withOpacity(0.25),
+              color: AppColors.glowAmber.withValues(alpha: 0.25),
               blurRadius: 10,
               spreadRadius: 1,
             ),
@@ -785,7 +785,7 @@ class _WhiteKeyVisualState extends ConsumerState<_WhiteKeyVisual>
     with SingleTickerProviderStateMixin {
   late final AnimationController _anim;
   late final Animation<double> _press;
-  final int _prevTrigger = 0;
+  // final int _prevTrigger = 0;
 
   @override
   void initState() {
@@ -875,18 +875,18 @@ class _WhiteKeyVisualState extends ConsumerState<_WhiteKeyVisual>
                       ),
                       boxShadow: isPressed
                           ? [BoxShadow(
-                        color: Colors.black.withOpacity(0.35),
+                        color: Colors.black.withValues(alpha: 0.35),
                         offset: const Offset(0, -2),
                         blurRadius: 4,
                       )]
                           : [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.45),
+                          color: Colors.black.withValues(alpha: 0.45),
                           offset: const Offset(0, 3),
                           blurRadius: 5,
                         ),
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.20),
+                          color: Colors.black.withValues(alpha: 0.20),
                           offset: const Offset(1, 0),
                           blurRadius: 2,
                         ),
@@ -908,8 +908,8 @@ class _WhiteKeyVisualState extends ConsumerState<_WhiteKeyVisual>
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 colors: [
-                                  Colors.white.withOpacity(isPressed ? 0.0 : 0.55),
-                                  Colors.white.withOpacity(0.0),
+                                  Colors.white.withValues(alpha: isPressed ? 0.0 : 0.55),
+                                  Colors.white.withValues(alpha: 0.0),
                                 ],
                               ),
                             ),
@@ -929,8 +929,8 @@ class _WhiteKeyVisualState extends ConsumerState<_WhiteKeyVisual>
                                     begin: Alignment.topCenter,
                                     end: Alignment.bottomCenter,
                                     colors: [
-                                      AppColors.glowAmber.withOpacity(0.22),
-                                      AppColors.glowAmber.withOpacity(0.04),
+                                      AppColors.glowAmber.withValues(alpha: 0.22),
+                                      AppColors.glowAmber.withValues(alpha: 0.04),
                                     ],
                                   ),
                                 ),
@@ -1073,13 +1073,13 @@ class _BlackKeyVisualState extends ConsumerState<_BlackKeyVisual>
                       ),
                       boxShadow: isPressed
                           ? [BoxShadow(
-                        color: Colors.black.withOpacity(0.9),
+                        color: Colors.black.withValues(alpha: 0.9),
                         offset: const Offset(0, 1),
                         blurRadius: 3,
                       )]
                           : [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.85),
+                          color: Colors.black.withValues(alpha: 0.85),
                           offset: const Offset(0, 5),
                           blurRadius: 10,
                           spreadRadius: 2,
@@ -1107,8 +1107,8 @@ class _BlackKeyVisualState extends ConsumerState<_BlackKeyVisual>
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 colors: [
-                                  Colors.white.withOpacity(isPressed ? 0.0 : 0.18),
-                                  Colors.white.withOpacity(0.0),
+                                  Colors.white.withValues(alpha: isPressed ? 0.0 : 0.18),
+                                  Colors.white.withValues(alpha: 0.0),
                                 ],
                               ),
                             ),
@@ -1127,8 +1127,8 @@ class _BlackKeyVisualState extends ConsumerState<_BlackKeyVisual>
                                     begin: Alignment.topCenter,
                                     end: Alignment.bottomCenter,
                                     colors: [
-                                      AppColors.glowCyan.withOpacity(0.28),
-                                      AppColors.glowCyan.withOpacity(0.05),
+                                      AppColors.glowCyan.withValues(alpha: 0.28),
+                                      AppColors.glowCyan.withValues(alpha: 0.05),
                                     ],
                                   ),
                                 ),
@@ -1268,7 +1268,7 @@ class _MinimapBar extends ConsumerWidget {
                       boxShadow: isPressed
                           ? [
                         BoxShadow(
-                          color: AppColors.glowAmber.withOpacity(0.6),
+                          color: AppColors.glowAmber.withValues(alpha: 0.6),
                           blurRadius: 6,
                         ),
                       ]
@@ -1302,7 +1302,7 @@ class _MinimapBar extends ConsumerWidget {
                         boxShadow: isPressed
                             ? [
                           BoxShadow(
-                            color: AppColors.glowCyan.withOpacity(0.7),
+                            color: AppColors.glowCyan.withValues(alpha: 0.7),
                             blurRadius: 6,
                           ),
                         ]
@@ -1322,19 +1322,19 @@ class _MinimapBar extends ConsumerWidget {
                       // Dimmed outside areas
                       Positioned(left: 0, top: 0, bottom: 0, width: winL,
                           child: Container(
-                              color: AppColors.background.withOpacity(0.55))),
+                              color: AppColors.background.withValues(alpha: 0.55))),
                       Positioned(
                           left: winL + winW, top: 0, bottom: 0,
                           right: 0,
                           child: Container(
-                              color: AppColors.background.withOpacity(0.55))),
+                              color: AppColors.background.withValues(alpha: 0.55))),
                       // Viewport indicator border
                       Positioned(
                         left: winL, top: 0, bottom: 0, width: winW,
                         child: Container(
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: AppColors.glowAmber.withOpacity(0.7),
+                              color: AppColors.glowAmber.withValues(alpha: 0.7),
                               width: 1.5,
                             ),
                             borderRadius: BorderRadius.circular(2),
@@ -1402,7 +1402,7 @@ class _BottomBar extends ConsumerWidget {
                 inactiveTrackColor: AppColors.panelBorder,
                 thumbColor: AppColors.glowAmberC,
                 overlayColor:
-                AppColors.glowAmber.withOpacity(0.18),
+                AppColors.glowAmber.withValues(alpha: 0.18),
                 trackShape: const _GlowTrackShape(),
               ),
               child: Slider(
@@ -1538,7 +1538,7 @@ class _HomeButtonState extends ConsumerState<_HomeButton>
             border: Border.all(color: AppColors.panelBorder),
             boxShadow: [
               BoxShadow(
-                color: AppColors.glowAmber.withOpacity(0.08),
+                color: AppColors.glowAmber.withValues(alpha: 0.08),
                 blurRadius: 8,
               ),
             ],
@@ -1601,7 +1601,7 @@ class _GlowTrackShape extends RoundedRectSliderTrackShape {
     );
     final paint = Paint()
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4)
-      ..color = AppColors.glowAmber.withOpacity(0.35);
+      ..color = AppColors.glowAmber.withValues(alpha: 0.35);
     final activeRect = Rect.fromLTRB(
       trackRect.left,
       trackRect.top - 1,
