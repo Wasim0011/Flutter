@@ -5,4 +5,7 @@ abstract final class AppRoutes {
 
   static const String phoneEntry = '/auth/phone';
   static const String phoneEntryName = 'phoneEntry';
+
+  static const String otpVerification = '/auth/verify';
+  static const String otpVerificationName = 'otpVerification';
 }

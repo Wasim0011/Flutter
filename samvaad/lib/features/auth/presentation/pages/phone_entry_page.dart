@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/router/app_routes.dart';
 import '../controllers/phone_entry_controller.dart';
 
 /// Entry point of Samvaad's sign-in flow: collect a phone number and
@@ -64,6 +66,14 @@ class _PhoneEntryPageState extends ConsumerState<PhoneEntryPage> {
     final String? sentNotice = state is PhoneEntrySent
         ? 'Code sent to ${state.phoneNumber} (verification id: ${state.verificationId})'
         : null;
+    // if (state is PhoneEntrySent) {
+    //   WidgetsBinding.instance.addPostFrameCallback((_) {
+    //     context.push(AppRoutes.otpVerification, extra: {
+    //       'verificationId': state.verificationId,
+    //       'phoneNumber': state.phoneNumber,
+    //     });
+    //   });
+    // }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Sign in')),
