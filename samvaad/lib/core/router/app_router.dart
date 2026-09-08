@@ -1,16 +1,17 @@
 import 'package:go_router/go_router.dart';
+import 'package:samvaad/features/auth/presentation/pages/phone_entry_page.dart';
 import '../../features/shell/presentation/pages/splash_page.dart';
 import 'app_routes.dart';
 
 /// Samvaad's declarative route table.
 final GoRouter appRouter = GoRouter(
-  initialLocation: AppRoutes.splash,
+  initialLocation: AppRoutes.phoneEntry,
   debugLogDiagnostics: true,
   routes: <RouteBase>[
     GoRoute(
-      path: AppRoutes.splash,
-      name: AppRoutes.splashName,
-      builder: (context, state) => const SplashPage(),
+      path: AppRoutes.phoneEntry,
+      name: AppRoutes.phoneEntryName,
+      builder: (context, state) => const PhoneEntryPage(),
     ),
   ],
 );
