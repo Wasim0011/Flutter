@@ -15,14 +15,10 @@ part of 'app_router.dart';
 /// therefore produces a fresh `GoRouter` whose `redirect` closes over
 /// an already-resolved `authState` — whenever auth state changes.
 ///
-/// An earlier version of this bridged the auth stream into GoRouter's
-/// own `refreshListenable` mechanism instead. That works in principle,
-/// but introduces two independent stream subscriptions racing each
-/// other (the listenable's, and the provider's own), with no guarantee
-/// `redirect` re-runs only after the provider has actually resolved.
-/// Watching the provider directly removes that race: `redirect` always
-/// sees the same already-computed `authState` the rest of this
-/// function saw when it built.
+/// Milestone 2.7 adds a second reactive dependency the same way:
+/// `redirect` also watches `hasCompletedOnboardingProvider` for the
+/// current user, so a signed-in user who hasn't set a communication
+/// preference yet is routed to onboarding before reaching anywhere else.
 
 @ProviderFor(appRouter)
 final appRouterProvider = AppRouterProvider._();
@@ -34,14 +30,10 @@ final appRouterProvider = AppRouterProvider._();
 /// therefore produces a fresh `GoRouter` whose `redirect` closes over
 /// an already-resolved `authState` — whenever auth state changes.
 ///
-/// An earlier version of this bridged the auth stream into GoRouter's
-/// own `refreshListenable` mechanism instead. That works in principle,
-/// but introduces two independent stream subscriptions racing each
-/// other (the listenable's, and the provider's own), with no guarantee
-/// `redirect` re-runs only after the provider has actually resolved.
-/// Watching the provider directly removes that race: `redirect` always
-/// sees the same already-computed `authState` the rest of this
-/// function saw when it built.
+/// Milestone 2.7 adds a second reactive dependency the same way:
+/// `redirect` also watches `hasCompletedOnboardingProvider` for the
+/// current user, so a signed-in user who hasn't set a communication
+/// preference yet is routed to onboarding before reaching anywhere else.
 
 final class AppRouterProvider
     extends $FunctionalProvider<GoRouter, GoRouter, GoRouter>
@@ -53,14 +45,10 @@ final class AppRouterProvider
   /// therefore produces a fresh `GoRouter` whose `redirect` closes over
   /// an already-resolved `authState` — whenever auth state changes.
   ///
-  /// An earlier version of this bridged the auth stream into GoRouter's
-  /// own `refreshListenable` mechanism instead. That works in principle,
-  /// but introduces two independent stream subscriptions racing each
-  /// other (the listenable's, and the provider's own), with no guarantee
-  /// `redirect` re-runs only after the provider has actually resolved.
-  /// Watching the provider directly removes that race: `redirect` always
-  /// sees the same already-computed `authState` the rest of this
-  /// function saw when it built.
+  /// Milestone 2.7 adds a second reactive dependency the same way:
+  /// `redirect` also watches `hasCompletedOnboardingProvider` for the
+  /// current user, so a signed-in user who hasn't set a communication
+  /// preference yet is routed to onboarding before reaching anywhere else.
   AppRouterProvider._()
     : super(
         from: null,
@@ -94,4 +82,4 @@ final class AppRouterProvider
   }
 }
 
-String _$appRouterHash() => r'32852bbd8b8f466aa5b56c23e3ac1193e9f02408';
+String _$appRouterHash() => r'02a2180b9e997ca0814b056cee308b5a90137bfb';

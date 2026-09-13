@@ -8,4 +8,7 @@ abstract final class AppRoutes {
 
   static const String otpVerification = '/auth/verify';
   static const String otpVerificationName = 'otpVerification';
+
+  static const String onboarding = '/onboarding';
+  static const String onboardingName = 'onboarding';
 }

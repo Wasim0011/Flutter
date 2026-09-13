@@ -27,35 +27,21 @@ class FirebaseAuthRepository implements AuthRepository {
     await _firebaseAuth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       timeout: const Duration(seconds: 60),
-
-      // Android can auto-retrieve the SMS code without the user typing
-      // it. When that happens, Firebase hands us a ready-made
-      // credential instead of ever calling `codeSent`. We sign in
-      // immediately here; the presentation layer (Milestone 2.5) will
-      // simply observe `authStateChanges()` completing the flow rather
-      // than waiting on this method's Future in that scenario. This
-      // keeps auto-retrieval fully behind this repository — the OTP
-      // screen doesn't need special-case logic for it.
       verificationCompleted: (fb.PhoneAuthCredential credential) async {
         if (!completer.isCompleted) {
           try {
             await _firebaseAuth.signInWithCredential(credential);
           } on fb.FirebaseAuthException catch (e) {
-            // Auto-verification failing isn't fatal to the explicit
-            // OTP flow the user can still complete manually — swallow
-            // it here rather than failing `sendOtp` over it.
             // ignore: avoid_print
             print('Auto-verification sign-in failed: ${e.code}');
           }
         }
       },
-
       verificationFailed: (fb.FirebaseAuthException e) {
         if (!completer.isCompleted) {
           completer.complete(Result.failure(_mapAuthException(e)));
         }
       },
-
       codeSent: (String verificationId, int? resendToken) {
         if (!completer.isCompleted) {
           completer.complete(
@@ -63,7 +49,6 @@ class FirebaseAuthRepository implements AuthRepository {
           );
         }
       },
-
       codeAutoRetrievalTimeout: (String verificationId) {
         // No-op: if codeSent already fired, the caller already has
         // what it needs. If it hasn't, verificationFailed or a
@@ -127,9 +112,6 @@ class FirebaseAuthRepository implements AuthRepository {
     );
   }
 
-  /// Translates Firebase's exception codes into our domain-level
-  /// [Failure] types, so nothing above this file ever needs to know
-  /// what a `FirebaseAuthException` even is.
   Failure _mapAuthException(fb.FirebaseAuthException e) {
     switch (e.code) {
       case 'invalid-phone-number':
