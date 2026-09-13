@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/widgets/app_sign_out_button.dart';
 import '../../../auth/domain/entities/app_user.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 
@@ -44,14 +45,18 @@ class SplashPage extends ConsumerWidget {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                data: (user) => Text(
-                  user != null
-                      ? 'Signed in as ${user.phoneNumber}'
-                      : 'Foundation build',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                  textAlign: TextAlign.center,
+                data: (user) => Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      user != null ? 'Signed in as ${user.phoneNumber}' : 'Foundation build',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    if (user != null) const AppSignOutButton(),
+                  ],
                 ),
               ),
             ],

@@ -63,19 +63,20 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
   }
 
   Future<void> _resend() async {
-    final phoneController = ref.read(phoneEntryControllerProvider.notifier);
-    await phoneController.submit(widget.phoneNumber);
+    final phoneNotifier = ref.read(phoneEntryControllerProvider.notifier);
+    await phoneNotifier.submit(widget.phoneNumber);
 
     final phoneState = ref.read(phoneEntryControllerProvider);
     if (phoneState is PhoneEntrySent) {
       setState(() => _verificationId = phoneState.verificationId);
       ref.read(resendCooldownControllerProvider.notifier).restart();
-      phoneController.reset();
+      phoneNotifier.reset();
+    } else if (phoneState is PhoneEntryFailed && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Couldn\'t resend: ${phoneState.message}')),
+      );
+      phoneNotifier.reset();
     }
-    // If resend fails, PhoneEntryController's own failed state isn't
-    // surfaced on this screen — a known limitation, see Future
-    // improvements. The cooldown simply won't restart, so the user
-    // can try Resend again once it expires.
   }
 
   @override
