@@ -1,6 +1,3 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -13,33 +10,31 @@ import 'app_routes.dart';
 
 part 'app_router.g.dart';
 
-/// Samvaad's declarative route table, now provided via Riverpod so
-/// `redirect` can react to live auth state (Milestone 2.3's
-/// `authStateChangesProvider`) — this is exactly the mechanical
-/// upgrade anticipated back in Milestone 4 of Phase 1, not a redesign.
+/// Samvaad's declarative route table.
+///
+/// Watches `authStateChangesProvider` directly (not just inside
+/// `redirect`) so that Riverpod itself rebuilds this provider — and
+/// therefore produces a fresh `GoRouter` whose `redirect` closes over
+/// an already-resolved `authState` — whenever auth state changes.
+///
+/// An earlier version of this bridged the auth stream into GoRouter's
+/// own `refreshListenable` mechanism instead. That works in principle,
+/// but introduces two independent stream subscriptions racing each
+/// other (the listenable's, and the provider's own), with no guarantee
+/// `redirect` re-runs only after the provider has actually resolved.
+/// Watching the provider directly removes that race: `redirect` always
+/// sees the same already-computed `authState` the rest of this
+/// function saw when it built.
 @riverpod
 GoRouter appRouter(Ref ref) {
+  final AsyncValue<AppUser?> authState = ref.watch(authStateChangesProvider);
+
   return GoRouter(
     initialLocation: AppRoutes.splash,
     debugLogDiagnostics: true,
-    // GoRouter needs to re-evaluate `redirect` whenever auth state
-    // changes (e.g. sign-out from a future settings screen) — this
-    // Listenable bridges the auth stream into something GoRouter can
-    // subscribe to directly. We go straight to the repository's raw
-    // Stream<AppUser?> here rather than a `.stream` provider modifier,
-    // since the raw stream is unambiguous regardless of how the
-    // generated provider class exposes (or doesn't expose) that
-    // modifier across Riverpod versions.
-    refreshListenable: GoRouterRefreshStream(
-      ref.watch(authRepositoryProvider).authStateChanges(),
-    ),
     redirect: (context, state) {
-      final AsyncValue<AppUser?> authState = ref.read(authStateChangesProvider);
-
       // While the very first auth-state event hasn't arrived yet,
-      // stay on splash rather than guessing — this is the "loading"
-      // window between app start and Firebase reporting whether
-      // anyone is signed in.
+      // stay on splash rather than guessing.
       if (authState.isLoading) {
         return state.matchedLocation == AppRoutes.splash ? null : AppRoutes.splash;
       }
@@ -53,10 +48,9 @@ GoRouter appRouter(Ref ref) {
         return AppRoutes.phoneEntry;
       }
       if (isSignedIn && (onAuthRoute || onSplash)) {
-        // No home/dashboard feature exists yet (that's a future
-        // phase) — land signed-in users back on splash, which will
-        // simply show a "signed in" placeholder for now rather than
-        // redirect-looping. See SplashPage.
+        // No home/dashboard feature exists yet (a future phase) —
+        // land signed-in users back on splash, which shows a
+        // "signed in" placeholder rather than redirect-looping.
         return null;
       }
       return null;
@@ -85,23 +79,4 @@ GoRouter appRouter(Ref ref) {
       ),
     ],
   );
-}
-
-/// Adapts a raw [Stream] into a [Listenable], which is what GoRouter's
-/// `refreshListenable` requires. This is the standard, documented
-/// bridge pattern for combining GoRouter with any stream-based state
-/// (Riverpod, Bloc, plain Streams) — GoRouter itself has no Riverpod
-/// awareness, so this small adapter is necessary glue, not a workaround.
-class GoRouterRefreshStream extends ChangeNotifier {
-  GoRouterRefreshStream(Stream<dynamic> stream) {
-    _subscription = stream.asBroadcastStream().listen((_) => notifyListeners());
-  }
-
-  late final StreamSubscription<dynamic> _subscription;
-
-  @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
-  }
 }

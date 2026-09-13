@@ -19,8 +19,8 @@ class FakeAuthRepository implements AuthRepository {
   /// If set, [verifyOtp] returns this failure instead of checking the OTP.
   Failure? verifyOtpFailure;
 
-  final StreamController<AppUser?> _authStateController =
-  StreamController<AppUser?>.broadcast();
+  AppUser? _currentUser;
+  final List<MultiStreamController<AppUser?>> _controllers = [];
 
   @override
   Future<Result<PhoneVerificationSent>> sendOtp(String phoneNumber) async {
@@ -45,19 +45,45 @@ class FakeAuthRepository implements AuthRepository {
     }
 
     const AppUser user = AppUser(id: 'fake-uid', phoneNumber: '+919999999999');
-    _authStateController.add(user);
+    _emit(user);
     return const Result.success(user);
   }
 
   @override
-  Stream<AppUser?> authStateChanges() => _authStateController.stream;
+  Stream<AppUser?> authStateChanges() {
+    // `Stream.multi` runs this callback once PER listener (unlike
+    // `StreamController.broadcast`'s `onListen`, which only fires on
+    // the very first subscriber). Real Firebase Auth's
+    // `authStateChanges()` gives every new listener the current state
+    // immediately on subscribe — this app has more than one
+    // subscriber to this stream (the auth-state provider itself, and
+    // the router's refresh listener), so a fake that only replays to
+    // the first one silently starves whichever subscribes second.
+    return Stream<AppUser?>.multi((controller) {
+      controller.add(_currentUser);
+      _controllers.add(controller);
+      controller.onCancel = () => _controllers.remove(controller);
+    });
+  }
 
   @override
   Future<Result<void>> signOut() async {
-    _authStateController.add(null);
+    _emit(null);
     return const Result.success(null);
   }
 
-  /// Call in `tearDown` to release the stream controller between tests.
-  void dispose() => _authStateController.close();
+  void _emit(AppUser? user) {
+    _currentUser = user;
+    for (final controller in List<MultiStreamController<AppUser?>>.of(_controllers)) {
+      controller.add(user);
+    }
+  }
+
+  /// Call in `tearDown` to release all active listeners between tests.
+  void dispose() {
+    for (final controller in List<MultiStreamController<AppUser?>>.of(_controllers)) {
+      controller.close();
+    }
+    _controllers.clear();
+  }
 }
