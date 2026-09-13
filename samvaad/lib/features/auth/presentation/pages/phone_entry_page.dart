@@ -55,25 +55,32 @@ class _PhoneEntryPageState extends ConsumerState<PhoneEntryPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Side-effect: navigate to OTP verification once an OTP has been
+    // sent. This must be a statement here in build(), via ref.listen —
+    // NOT embedded inside the widget tree below. ref.listen reacts to
+    // state *transitions* (previous -> next), which is exactly what
+    // "navigate once, when this happens" needs; ref.watch (used below
+    // for rendering) would re-fire on every rebuild instead.
+    ref.listen<PhoneEntryState>(phoneEntryControllerProvider, (previous, next) {
+      if (next is PhoneEntrySent) {
+        context.push(
+          AppRoutes.otpVerification,
+          extra: {
+            'verificationId': next.verificationId,
+            'phoneNumber': next.phoneNumber,
+          },
+        );
+        // Reset immediately after triggering navigation so returning
+        // to this screen (e.g. via back button) shows idle, not a
+        // stale "sent" state that would try to navigate again.
+        ref.read(phoneEntryControllerProvider.notifier).reset();
+      }
+    });
+
     final ThemeData theme = Theme.of(context);
     final PhoneEntryState state = ref.watch(phoneEntryControllerProvider);
     final bool isSubmitting = state is PhoneEntrySubmitting;
-
-    // PhoneEntrySent handling (navigation) is deferred to Milestone
-    // 2.6 once routing/guards exist. For now we surface it as an
-    // inline confirmation so this milestone is independently verifiable.
     final String? errorMessage = state is PhoneEntryFailed ? state.message : null;
-    final String? sentNotice = state is PhoneEntrySent
-        ? 'Code sent to ${state.phoneNumber} (verification id: ${state.verificationId})'
-        : null;
-    // if (state is PhoneEntrySent) {
-    //   WidgetsBinding.instance.addPostFrameCallback((_) {
-    //     context.push(AppRoutes.otpVerification, extra: {
-    //       'verificationId': state.verificationId,
-    //       'phoneNumber': state.phoneNumber,
-    //     });
-    //   });
-    // }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Sign in')),
@@ -124,20 +131,6 @@ class _PhoneEntryPageState extends ConsumerState<PhoneEntryPage> {
                         errorMessage,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.error,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                if (sentNotice != null)
-                  Semantics(
-                    liveRegion: true,
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: Text(
-                        sentNotice,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.primary,
                         ),
                         textAlign: TextAlign.center,
                       ),

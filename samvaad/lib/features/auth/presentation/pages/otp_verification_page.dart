@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/router/app_routes.dart';
 import '../controllers/otp_verification_controller.dart';
 import '../controllers/phone_entry_controller.dart';
+import 'package:go_router/go_router.dart';
 
 /// Second step of Samvaad's sign-in flow: enter the OTP sent to
 /// [phoneNumber], with a resend option gated by a cooldown timer.
@@ -83,6 +85,16 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
     final int secondsRemaining = ref.watch(resendCooldownControllerProvider);
     final bool isSubmitting = state is OtpVerificationSubmitting;
     final String? errorMessage = state is OtpVerificationFailed ? state.message : null;
+
+    ref.listen<OtpVerificationState>(otpVerificationControllerProvider, (previous, next) {
+      if (next is OtpVerificationSucceeded) {
+        // The router's redirect (Milestone 2.6) will take over from
+        // here based on authStateChangesProvider now reporting a
+        // signed-in user — we just need to trigger a re-evaluation by
+        // navigating anywhere; GoRouter's redirect intercepts it.
+        context.go(AppRoutes.splash);
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(title: const Text('Verify your number')),

@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/providers/firebase_status_provider.dart';
+import '../../../auth/domain/entities/app_user.dart';
+import '../../../auth/presentation/providers/auth_providers.dart';
 
 /// Samvaad's entry screen.
 ///
-/// Milestone 2.1 temporarily displays Firebase connectivity status here
-/// as proof-of-wiring — the same throwaway pattern used for
-/// `appInfoProvider` in Phase 1. Once real auth state exists
-/// (Milestone 2.6), this becomes the actual splash/routing-decision
-/// screen.
+/// With the router guard (Milestone 2.6) now in place, this screen is
+/// reached in exactly two situations: (1) briefly, while the very
+/// first auth-state check is in flight, showing a loading indicator;
+/// or (2) after a signed-in user is redirected here with nowhere else
+/// to go yet, since no home/dashboard feature exists until a later
+/// phase. Case (2) is a deliberate, temporary placeholder — it will
+/// be replaced the moment a real home screen exists.
 class SplashPage extends ConsumerWidget {
   const SplashPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
-    final String status = ref.watch(firebaseStatusProvider);
+    final AsyncValue<AppUser?> authState = ref.watch(authStateChangesProvider);
 
     return Scaffold(
       body: Center(
@@ -31,13 +34,25 @@ class SplashPage extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text('Samvaad', style: theme.textTheme.headlineMedium),
-              const SizedBox(height: 8),
-              Text(
-                status,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+              const SizedBox(height: 24),
+              authState.when(
+                loading: () => const CircularProgressIndicator(),
+                error: (error, stackTrace) => Text(
+                  'Something went wrong. Please restart the app.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.error,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
+                data: (user) => Text(
+                  user != null
+                      ? 'Signed in as ${user.phoneNumber}'
+                      : 'Foundation build',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ],
           ),
