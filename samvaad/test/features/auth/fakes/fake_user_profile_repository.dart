@@ -3,19 +3,35 @@ import 'package:samvaad/features/auth/domain/entities/app_user.dart';
 import 'package:samvaad/features/auth/domain/repositories/user_profile_repository.dart';
 
 class FakeUserProfileRepository implements UserProfileRepository {
-  final Map<String, CommunicationPreference> _stored = {};
+  final Map<String, CommunicationPreference> _preferences = {};
+  final Map<String, String> _phoneNumbersByUserId = {};
+
+  @override
+  Future<Result<void>> ensureUserDocument({
+    required String userId,
+    required String phoneNumber,
+  }) async {
+    _phoneNumbersByUserId[userId] = phoneNumber;
+    return const Result.success(null);
+  }
 
   @override
   Future<Result<void>> saveCommunicationPreference({
     required String userId,
     required CommunicationPreference preference,
   }) async {
-    _stored[userId] = preference;
+    _preferences[userId] = preference;
     return const Result.success(null);
   }
 
   @override
   Future<Result<CommunicationPreference?>> getCommunicationPreference(String userId) async {
-    return Result.success(_stored[userId]);
+    return Result.success(_preferences[userId]);
+  }
+
+  @override
+  Future<Result<String?>> findUserIdByPhoneNumber(String phoneNumber) async {
+    final entry = _phoneNumbersByUserId.entries.where((e) => e.value == phoneNumber).firstOrNull;
+    return Result.success(entry?.key);
   }
 }

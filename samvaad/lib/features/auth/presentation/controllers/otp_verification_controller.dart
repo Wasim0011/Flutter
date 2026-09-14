@@ -1,10 +1,11 @@
 import 'dart:async';
-
+import '../../../../core/error/result.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/error/failure.dart';
 import '../../domain/entities/app_user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import 'auth_providers_export.dart';
+import 'onboarding_controller.dart';
 
 part 'otp_verification_controller.g.dart';
 
@@ -52,6 +53,19 @@ class OtpVerificationController extends _$OtpVerificationController {
       verificationId: verificationId,
       otp: otp,
     );
+
+    // Ensure a Firestore user document exists before reporting success,
+    // so chat's phone-number lookup (Milestone 3.2) always has
+    // something to find immediately after sign-in. A failure here
+    // doesn't fail the sign-in itself — the user is still
+    // authenticated — but is worth knowing about if it ever happens
+    // silently in production (see Future improvements).
+    if (result case Success<AppUser>(data: final user)) {
+      await ref.read(userProfileRepositoryProvider).ensureUserDocument(
+        userId: user.id,
+        phoneNumber: user.phoneNumber,
+      );
+    }
 
     state = result.fold(
       onSuccess: (user) => OtpVerificationSucceeded(user),

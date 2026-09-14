@@ -1,9 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:samvaad/features/auth/domain/repositories/auth_repository.dart';
+import 'package:samvaad/features/auth/presentation/controllers/onboarding_controller.dart';
 import 'package:samvaad/features/auth/presentation/controllers/otp_verification_controller.dart';
 import 'package:samvaad/features/auth/presentation/providers/auth_providers.dart';
 import '../../fakes/fake_auth_repository.dart';
+import '../../fakes/fake_user_profile_repository.dart';
 
 void main() {
   late FakeAuthRepository fakeRepo;
@@ -13,7 +14,13 @@ void main() {
     fakeRepo = FakeAuthRepository();
     container = ProviderContainer(
       overrides: [
-        authRepositoryProvider.overrideWithValue(fakeRepo as AuthRepository),
+        authRepositoryProvider.overrideWithValue(fakeRepo),
+        // Milestone 3.2: submit() now also calls
+        // userProfileRepositoryProvider (ensureUserDocument), so this
+        // needs a fake too — without it, the real Firestore-backed
+        // provider gets constructed and fails with "no Firebase app"
+        // in a plain unit test.
+        userProfileRepositoryProvider.overrideWithValue(FakeUserProfileRepository()),
       ],
     );
   });
@@ -61,9 +68,6 @@ void main() {
     final int initial = container.read(resendCooldownControllerProvider);
     expect(initial, 30);
 
-    // restart() resets to 30 regardless of current countdown position —
-    // we don't assert on tick timing here to keep this test fast and
-    // avoid depending on real Timer delays.
     container.read(resendCooldownControllerProvider.notifier).restart();
     expect(container.read(resendCooldownControllerProvider), 30);
   });
