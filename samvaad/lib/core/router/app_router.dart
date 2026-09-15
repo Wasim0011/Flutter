@@ -7,6 +7,9 @@ import '../../features/auth/presentation/pages/onboarding_page.dart';
 import '../../features/auth/presentation/pages/otp_verification_page.dart';
 import '../../features/auth/presentation/pages/phone_entry_page.dart';
 import '../../features/auth/presentation/providers/auth_providers.dart';
+import '../../features/chat/presentation/pages/conversation_list_page.dart';
+import '../../features/chat/presentation/pages/create_group_page.dart';
+import '../../features/chat/presentation/pages/start_chat_page.dart';
 import '../../features/shell/presentation/pages/splash_page.dart';
 import 'app_routes.dart';
 
@@ -14,15 +17,16 @@ part 'app_router.g.dart';
 
 /// Samvaad's declarative route table.
 ///
-/// Watches `authStateChangesProvider` directly (not just inside
-/// `redirect`) so that Riverpod itself rebuilds this provider — and
-/// therefore produces a fresh `GoRouter` whose `redirect` closes over
-/// an already-resolved `authState` — whenever auth state changes.
+/// Watches `authStateChangesProvider` directly so Riverpod rebuilds
+/// this provider — and produces a fresh `GoRouter` whose `redirect`
+/// closes over already-resolved auth/onboarding state — whenever
+/// either changes.
 ///
-/// Milestone 2.7 adds a second reactive dependency the same way:
-/// `redirect` also watches `hasCompletedOnboardingProvider` for the
-/// current user, so a signed-in user who hasn't set a communication
-/// preference yet is routed to onboarding before reaching anywhere else.
+/// Milestone 3.3 adds `home` as the true landing screen for a
+/// signed-in, onboarded user. `splash` is now purely the loading/
+/// decision screen shown only while auth or onboarding status is
+/// still being determined — a fully resolved user is always bounced
+/// off it toward `home`, never left there.
 @riverpod
 GoRouter appRouter(Ref ref) {
   final AsyncValue<AppUser?> authState = ref.watch(authStateChangesProvider);
@@ -42,14 +46,14 @@ GoRouter appRouter(Ref ref) {
       final bool onAuthRoute = state.matchedLocation == AppRoutes.phoneEntry ||
           state.matchedLocation == AppRoutes.otpVerification;
       final bool onOnboarding = state.matchedLocation == AppRoutes.onboarding;
-      // final bool onSplash = state.matchedLocation == AppRoutes.splash;
+      final bool onSplash = state.matchedLocation == AppRoutes.splash;
 
       if (!isSignedIn && !onAuthRoute) {
         return AppRoutes.phoneEntry;
       }
 
       if (isSignedIn && onAuthRoute) {
-        return AppRoutes.splash;
+        return AppRoutes.home;
       }
 
       if (isSignedIn) {
@@ -65,10 +69,10 @@ GoRouter appRouter(Ref ref) {
           return AppRoutes.onboarding;
         }
         if (completed && onOnboarding) {
-          // No home/dashboard feature exists yet (a future phase) —
-          // land back on splash, which shows a "signed in" placeholder
-          // rather than redirect-looping.
-          return AppRoutes.splash;
+          return AppRoutes.home;
+        }
+        if (completed && onSplash) {
+          return AppRoutes.home;
         }
       }
 
@@ -100,6 +104,21 @@ GoRouter appRouter(Ref ref) {
         path: AppRoutes.onboarding,
         name: AppRoutes.onboardingName,
         builder: (context, state) => OnboardingPage(userId: currentUser!.id),
+      ),
+      GoRoute(
+        path: AppRoutes.home,
+        name: AppRoutes.homeName,
+        builder: (context, state) => const ConversationListPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.startChat,
+        name: AppRoutes.startChatName,
+        builder: (context, state) => const StartChatPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.createGroup,
+        name: AppRoutes.createGroupName,
+        builder: (context, state) => const CreateGroupPage(),
       ),
     ],
   );

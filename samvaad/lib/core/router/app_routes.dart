@@ -11,4 +11,13 @@ abstract final class AppRoutes {
 
   static const String onboarding = '/onboarding';
   static const String onboardingName = 'onboarding';
+
+  static const String home = '/home';
+  static const String homeName = 'home';
+
+  static const String startChat = '/home/start-chat';
+  static const String startChatName = 'startChat';
+
+  static const String createGroup = '/home/create-group';
+  static const String createGroupName = 'createGroup';
 }

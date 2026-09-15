@@ -10,45 +10,48 @@ part of 'app_router.dart';
 // ignore_for_file: type=lint, type=warning
 /// Samvaad's declarative route table.
 ///
-/// Watches `authStateChangesProvider` directly (not just inside
-/// `redirect`) so that Riverpod itself rebuilds this provider — and
-/// therefore produces a fresh `GoRouter` whose `redirect` closes over
-/// an already-resolved `authState` — whenever auth state changes.
+/// Watches `authStateChangesProvider` directly so Riverpod rebuilds
+/// this provider — and produces a fresh `GoRouter` whose `redirect`
+/// closes over already-resolved auth/onboarding state — whenever
+/// either changes.
 ///
-/// Milestone 2.7 adds a second reactive dependency the same way:
-/// `redirect` also watches `hasCompletedOnboardingProvider` for the
-/// current user, so a signed-in user who hasn't set a communication
-/// preference yet is routed to onboarding before reaching anywhere else.
+/// Milestone 3.3 adds `home` as the true landing screen for a
+/// signed-in, onboarded user. `splash` is now purely the loading/
+/// decision screen shown only while auth or onboarding status is
+/// still being determined — a fully resolved user is always bounced
+/// off it toward `home`, never left there.
 
 @ProviderFor(appRouter)
 final appRouterProvider = AppRouterProvider._();
 
 /// Samvaad's declarative route table.
 ///
-/// Watches `authStateChangesProvider` directly (not just inside
-/// `redirect`) so that Riverpod itself rebuilds this provider — and
-/// therefore produces a fresh `GoRouter` whose `redirect` closes over
-/// an already-resolved `authState` — whenever auth state changes.
+/// Watches `authStateChangesProvider` directly so Riverpod rebuilds
+/// this provider — and produces a fresh `GoRouter` whose `redirect`
+/// closes over already-resolved auth/onboarding state — whenever
+/// either changes.
 ///
-/// Milestone 2.7 adds a second reactive dependency the same way:
-/// `redirect` also watches `hasCompletedOnboardingProvider` for the
-/// current user, so a signed-in user who hasn't set a communication
-/// preference yet is routed to onboarding before reaching anywhere else.
+/// Milestone 3.3 adds `home` as the true landing screen for a
+/// signed-in, onboarded user. `splash` is now purely the loading/
+/// decision screen shown only while auth or onboarding status is
+/// still being determined — a fully resolved user is always bounced
+/// off it toward `home`, never left there.
 
 final class AppRouterProvider
     extends $FunctionalProvider<GoRouter, GoRouter, GoRouter>
     with $Provider<GoRouter> {
   /// Samvaad's declarative route table.
   ///
-  /// Watches `authStateChangesProvider` directly (not just inside
-  /// `redirect`) so that Riverpod itself rebuilds this provider — and
-  /// therefore produces a fresh `GoRouter` whose `redirect` closes over
-  /// an already-resolved `authState` — whenever auth state changes.
+  /// Watches `authStateChangesProvider` directly so Riverpod rebuilds
+  /// this provider — and produces a fresh `GoRouter` whose `redirect`
+  /// closes over already-resolved auth/onboarding state — whenever
+  /// either changes.
   ///
-  /// Milestone 2.7 adds a second reactive dependency the same way:
-  /// `redirect` also watches `hasCompletedOnboardingProvider` for the
-  /// current user, so a signed-in user who hasn't set a communication
-  /// preference yet is routed to onboarding before reaching anywhere else.
+  /// Milestone 3.3 adds `home` as the true landing screen for a
+  /// signed-in, onboarded user. `splash` is now purely the loading/
+  /// decision screen shown only while auth or onboarding status is
+  /// still being determined — a fully resolved user is always bounced
+  /// off it toward `home`, never left there.
   AppRouterProvider._()
     : super(
         from: null,
@@ -82,4 +85,4 @@ final class AppRouterProvider
   }
 }
 
-String _$appRouterHash() => r'ee536306b76788a32b4e5e3c02ef6f4f41ce493f';
+String _$appRouterHash() => r'd04723ad062e4a0085e97a6a7563c75509aaf99e';
