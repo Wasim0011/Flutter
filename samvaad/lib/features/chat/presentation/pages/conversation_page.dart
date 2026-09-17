@@ -26,12 +26,10 @@ class ConversationPage extends ConsumerStatefulWidget {
 
 class _ConversationPageState extends ConsumerState<ConversationPage> {
   final _textController = TextEditingController();
-  final _scrollController = ScrollController();
 
   @override
   void dispose() {
     _textController.dispose();
-    _scrollController.dispose();
     super.dispose();
   }
 
@@ -96,21 +94,23 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
                     ),
                   );
                 }
+                // reverse: true anchors the list at the bottom and
+                // keeps it there as new messages arrive — the standard
+                // chat-list pattern, and simpler/more robust than
+                // manually driving a ScrollController on every update.
+                final List<Message> reversedMessages = messages.reversed.toList();
                 return ListView.builder(
-                  controller: _scrollController,
+                  reverse: true,
                   padding: const EdgeInsets.all(16),
-                  itemCount: messages.length,
+                  itemCount: reversedMessages.length,
                   itemBuilder: (context, index) {
-                    final Message message = messages[index];
+                    final Message message = reversedMessages[index];
                     final bool isMine = message.senderId == currentUserId;
                     final Widget bubble = _MessageBubble(
                       message: message,
                       isMine: isMine,
                       style: style,
                     );
-                    // Only announce incoming (not our own outgoing)
-                    // messages as a live region — announcing your own
-                    // just-sent message back to you is redundant noise.
                     if (style.announceIncomingMessages && !isMine) {
                       return Semantics(liveRegion: true, child: bubble);
                     }

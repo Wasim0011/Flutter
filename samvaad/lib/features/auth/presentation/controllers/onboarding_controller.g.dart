@@ -90,7 +90,7 @@ final class OnboardingControllerProvider
 }
 
 String _$onboardingControllerHash() =>
-    r'4f2ab2f74e44d7bc88c2d8f59dc8b10544b48297';
+    r'b94582e281eb73a2cfebd7e4e042e0b4cbfbe0d8';
 
 abstract class _$OnboardingController extends $Notifier<OnboardingState> {
   OnboardingState build();
@@ -110,35 +110,12 @@ abstract class _$OnboardingController extends $Notifier<OnboardingState> {
   }
 }
 
-/// Whether the current signed-in user has already completed
-/// onboarding — the router guard (below) uses this to decide whether
-/// to show OnboardingPage or let the user through.
-///
-/// FutureProvider rather than a controller method: this is a one-shot
-/// read tied to the current user id, re-fetched whenever that id
-/// changes (family-like behavior via ref.watch on authStateChanges).
-
 @ProviderFor(hasCompletedOnboarding)
 final hasCompletedOnboardingProvider = HasCompletedOnboardingFamily._();
-
-/// Whether the current signed-in user has already completed
-/// onboarding — the router guard (below) uses this to decide whether
-/// to show OnboardingPage or let the user through.
-///
-/// FutureProvider rather than a controller method: this is a one-shot
-/// read tied to the current user id, re-fetched whenever that id
-/// changes (family-like behavior via ref.watch on authStateChanges).
 
 final class HasCompletedOnboardingProvider
     extends $FunctionalProvider<AsyncValue<bool>, bool, FutureOr<bool>>
     with $FutureModifier<bool>, $FutureProvider<bool> {
-  /// Whether the current signed-in user has already completed
-  /// onboarding — the router guard (below) uses this to decide whether
-  /// to show OnboardingPage or let the user through.
-  ///
-  /// FutureProvider rather than a controller method: this is a one-shot
-  /// read tied to the current user id, re-fetched whenever that id
-  /// changes (family-like behavior via ref.watch on authStateChanges).
   HasCompletedOnboardingProvider._({
     required HasCompletedOnboardingFamily super.from,
     required String super.argument,
@@ -186,14 +163,6 @@ final class HasCompletedOnboardingProvider
 String _$hasCompletedOnboardingHash() =>
     r'0314940df574972845142a296d149fab1d513ca3';
 
-/// Whether the current signed-in user has already completed
-/// onboarding — the router guard (below) uses this to decide whether
-/// to show OnboardingPage or let the user through.
-///
-/// FutureProvider rather than a controller method: this is a one-shot
-/// read tied to the current user id, re-fetched whenever that id
-/// changes (family-like behavior via ref.watch on authStateChanges).
-
 final class HasCompletedOnboardingFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<bool>, String> {
   HasCompletedOnboardingFamily._()
@@ -205,14 +174,6 @@ final class HasCompletedOnboardingFamily extends $Family
         isAutoDispose: true,
       );
 
-  /// Whether the current signed-in user has already completed
-  /// onboarding — the router guard (below) uses this to decide whether
-  /// to show OnboardingPage or let the user through.
-  ///
-  /// FutureProvider rather than a controller method: this is a one-shot
-  /// read tied to the current user id, re-fetched whenever that id
-  /// changes (family-like behavior via ref.watch on authStateChanges).
-
   HasCompletedOnboardingProvider call(String userId) =>
       HasCompletedOnboardingProvider._(argument: userId, from: this);
 
@@ -221,17 +182,13 @@ final class HasCompletedOnboardingFamily extends $Family
 }
 
 /// The current [CommunicationPreference] for [userId], or null if not
-/// yet set. Used by the chat feature (Milestone 3.4) to adapt message
-/// screen layout — larger text and live-region announcements for
-/// captionsFirst, denser layout for textFirst, and so on.
+/// yet set. Used by the chat feature to adapt message screen layout.
 
 @ProviderFor(communicationPreference)
 final communicationPreferenceProvider = CommunicationPreferenceFamily._();
 
 /// The current [CommunicationPreference] for [userId], or null if not
-/// yet set. Used by the chat feature (Milestone 3.4) to adapt message
-/// screen layout — larger text and live-region announcements for
-/// captionsFirst, denser layout for textFirst, and so on.
+/// yet set. Used by the chat feature to adapt message screen layout.
 
 final class CommunicationPreferenceProvider
     extends
@@ -244,9 +201,7 @@ final class CommunicationPreferenceProvider
         $FutureModifier<CommunicationPreference?>,
         $FutureProvider<CommunicationPreference?> {
   /// The current [CommunicationPreference] for [userId], or null if not
-  /// yet set. Used by the chat feature (Milestone 3.4) to adapt message
-  /// screen layout — larger text and live-region announcements for
-  /// captionsFirst, denser layout for textFirst, and so on.
+  /// yet set. Used by the chat feature to adapt message screen layout.
   CommunicationPreferenceProvider._({
     required CommunicationPreferenceFamily super.from,
     required String super.argument,
@@ -296,9 +251,7 @@ String _$communicationPreferenceHash() =>
     r'c4148139bc5a84a4d7ab34d1cb2b38db29b88918';
 
 /// The current [CommunicationPreference] for [userId], or null if not
-/// yet set. Used by the chat feature (Milestone 3.4) to adapt message
-/// screen layout — larger text and live-region announcements for
-/// captionsFirst, denser layout for textFirst, and so on.
+/// yet set. Used by the chat feature to adapt message screen layout.
 
 final class CommunicationPreferenceFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<CommunicationPreference?>, String> {
@@ -312,13 +265,99 @@ final class CommunicationPreferenceFamily extends $Family
       );
 
   /// The current [CommunicationPreference] for [userId], or null if not
-  /// yet set. Used by the chat feature (Milestone 3.4) to adapt message
-  /// screen layout — larger text and live-region announcements for
-  /// captionsFirst, denser layout for textFirst, and so on.
+  /// yet set. Used by the chat feature to adapt message screen layout.
 
   CommunicationPreferenceProvider call(String userId) =>
       CommunicationPreferenceProvider._(argument: userId, from: this);
 
   @override
   String toString() => r'communicationPreferenceProvider';
+}
+
+/// The stored display name for [userId], or null if not set. Used by
+/// chat's conversation list and conversation screen to show real
+/// names instead of raw user ids.
+
+@ProviderFor(displayName)
+final displayNameProvider = DisplayNameFamily._();
+
+/// The stored display name for [userId], or null if not set. Used by
+/// chat's conversation list and conversation screen to show real
+/// names instead of raw user ids.
+
+final class DisplayNameProvider
+    extends $FunctionalProvider<AsyncValue<String?>, String?, FutureOr<String?>>
+    with $FutureModifier<String?>, $FutureProvider<String?> {
+  /// The stored display name for [userId], or null if not set. Used by
+  /// chat's conversation list and conversation screen to show real
+  /// names instead of raw user ids.
+  DisplayNameProvider._({
+    required DisplayNameFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'displayNameProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$displayNameHash();
+
+  @override
+  String toString() {
+    return r'displayNameProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<String?> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<String?> create(Ref ref) {
+    final argument = this.argument as String;
+    return displayName(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is DisplayNameProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$displayNameHash() => r'e414ac9e0b492472260d351a43f0018e1409bf0d';
+
+/// The stored display name for [userId], or null if not set. Used by
+/// chat's conversation list and conversation screen to show real
+/// names instead of raw user ids.
+
+final class DisplayNameFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<String?>, String> {
+  DisplayNameFamily._()
+    : super(
+        retry: null,
+        name: r'displayNameProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// The stored display name for [userId], or null if not set. Used by
+  /// chat's conversation list and conversation screen to show real
+  /// names instead of raw user ids.
+
+  DisplayNameProvider call(String userId) =>
+      DisplayNameProvider._(argument: userId, from: this);
+
+  @override
+  String toString() => r'displayNameProvider';
 }

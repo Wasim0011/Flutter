@@ -71,4 +71,30 @@ class FirestoreUserProfileRepository implements UserProfileRepository {
       return Result.failure(Failure.unexpected(e.toString()));
     }
   }
+
+  @override
+  Future<Result<void>> saveDisplayName({
+    required String userId,
+    required String displayName,
+  }) async {
+    try {
+      await _users.doc(userId).set(
+        {'displayName': displayName},
+        SetOptions(merge: true),
+      );
+      return const Result.success(null);
+    } catch (e) {
+      return Result.failure(Failure.unexpected(e.toString()));
+    }
+  }
+
+  @override
+  Future<Result<String?>> getDisplayName(String userId) async {
+    try {
+      final doc = await _users.doc(userId).get();
+      return Result.success(doc.data()?['displayName'] as String?);
+    } catch (e) {
+      return Result.failure(Failure.unexpected(e.toString()));
+    }
+  }
 }

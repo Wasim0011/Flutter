@@ -6,9 +6,6 @@ import '../../../../core/router/app_routes.dart';
 import '../../domain/entities/app_user.dart';
 import '../controllers/onboarding_controller.dart';
 
-/// Shown once, after a user's first successful sign-in, to collect how
-/// they prefer to communicate. This directly shapes future chat/calling
-/// UI defaults — not a cosmetic preference.
 class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({required this.userId, super.key});
 
@@ -19,13 +16,24 @@ class OnboardingPage extends ConsumerStatefulWidget {
 }
 
 class _OnboardingPageState extends ConsumerState<OnboardingPage> {
+  final _nameController = TextEditingController();
   CommunicationPreference? _selected;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  bool get _canSubmit => _nameController.text.trim().isNotEmpty && _selected != null;
 
   void _submit() {
     final CommunicationPreference? preference = _selected;
-    if (preference == null) return;
+    final String name = _nameController.text.trim();
+    if (preference == null || name.isEmpty) return;
     ref.read(onboardingControllerProvider.notifier).submit(
       userId: widget.userId,
+      displayName: name,
       preference: preference,
     );
   }
@@ -43,13 +51,30 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('How do you communicate?')),
+      appBar: AppBar(title: const Text('Set up your profile')),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
+              Text(
+                'What should people call you?',
+                style: theme.textTheme.titleLarge,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _nameController,
+                textCapitalization: TextCapitalization.words,
+                decoration: const InputDecoration(labelText: 'Display name'),
+                onChanged: (_) => setState(() {}),
+              ),
+              const SizedBox(height: 32),
+              Text(
+                'How do you communicate?',
+                style: theme.textTheme.titleLarge,
+              ),
+              const SizedBox(height: 8),
               Text(
                 'This helps Samvaad show you the right tools by default — '
                     'you can change it anytime in settings.',
@@ -57,11 +82,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
-              const SizedBox(height: 24),
-              // RadioGroup replaces per-tile groupValue/onChanged
-              // (deprecated in current Flutter) — one ancestor now
-              // owns the selected value and change notification for
-              // every RadioListTile beneath it.
+              const SizedBox(height: 16),
               RadioGroup<CommunicationPreference>(
                 groupValue: _selected,
                 onChanged: (value) => setState(() => _selected = value),
@@ -107,16 +128,12 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                     ),
                   ),
                 ),
-              // Semantics(button: true) ensures screen readers announce
-              // this as an actionable button even while its onPressed
-              // is null (disabled) — without it, some screen readers
-              // treat a disabled ElevatedButton ambiguously.
               Semantics(
                 button: true,
-                enabled: _selected != null && !isSubmitting,
+                enabled: _canSubmit && !isSubmitting,
                 label: 'Continue',
                 child: ElevatedButton(
-                  onPressed: (_selected == null || isSubmitting) ? null : _submit,
+                  onPressed: (!_canSubmit || isSubmitting) ? null : _submit,
                   child: isSubmitting
                       ? const SizedBox(
                     height: 22,

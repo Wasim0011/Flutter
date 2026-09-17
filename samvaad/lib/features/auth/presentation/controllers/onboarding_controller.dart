@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 import '../../data/repositories/firestore_user_profile_repository.dart';
 import '../../domain/entities/app_user.dart';
 import '../../domain/repositories/user_profile_repository.dart';
@@ -38,43 +39,65 @@ class OnboardingController extends _$OnboardingController {
 
   Future<void> submit({
     required String userId,
+    required String displayName,
     required CommunicationPreference preference,
   }) async {
     state = const OnboardingSubmitting();
 
-    final result = await ref
-        .read(userProfileRepositoryProvider)
-        .saveCommunicationPreference(userId: userId, preference: preference);
+    final UserProfileRepository repo = ref.read(userProfileRepositoryProvider);
 
-    state = result.fold(
+    final nameResult = await repo.saveDisplayName(userId: userId, displayName: displayName);
+    if (nameResult.isFailure) {
+      state = OnboardingFailed(
+        nameResult.fold(onSuccess: (_) => '', onFailure: (f) => f.message),
+      );
+      return;
+    }
+
+    final preferenceResult =
+    await repo.saveCommunicationPreference(userId: userId, preference: preference);
+
+    if (preferenceResult.isSuccess) {
+      // hasCompletedOnboardingProvider and displayNameProvider are
+      // plain FutureProviders — they cache their resolved value and
+      // never recompute on their own just because Firestore changed
+      // underneath them. Without this invalidation, the router's
+      // redirect (which reads hasCompletedOnboardingProvider) would
+      // keep seeing a stale "not completed" result and could bounce a
+      // freshly-onboarded user back to /onboarding indefinitely.
+      ref.invalidate(hasCompletedOnboardingProvider(userId));
+      ref.invalidate(displayNameProvider(userId));
+    }
+
+    state = preferenceResult.fold(
       onSuccess: (_) => const OnboardingComplete(),
       onFailure: (failure) => OnboardingFailed(failure.message),
     );
   }
 }
 
-/// Whether the current signed-in user has already completed
-/// onboarding — the router guard (below) uses this to decide whether
-/// to show OnboardingPage or let the user through.
-///
-/// FutureProvider rather than a controller method: this is a one-shot
-/// read tied to the current user id, re-fetched whenever that id
-/// changes (family-like behavior via ref.watch on authStateChanges).
 @riverpod
 Future<bool> hasCompletedOnboarding(Ref ref, String userId) async {
   final result = await ref.read(userProfileRepositoryProvider).getCommunicationPreference(userId);
   return result.fold(
     onSuccess: (preference) => preference != null,
-    onFailure: (_) => false, // fail open to onboarding on error, not through it
+    onFailure: (_) => false,
   );
 }
 
 /// The current [CommunicationPreference] for [userId], or null if not
-/// yet set. Used by the chat feature (Milestone 3.4) to adapt message
-/// screen layout — larger text and live-region announcements for
-/// captionsFirst, denser layout for textFirst, and so on.
+/// yet set. Used by the chat feature to adapt message screen layout.
 @riverpod
 Future<CommunicationPreference?> communicationPreference(Ref ref, String userId) async {
   final result = await ref.read(userProfileRepositoryProvider).getCommunicationPreference(userId);
   return result.fold(onSuccess: (preference) => preference, onFailure: (_) => null);
+}
+
+/// The stored display name for [userId], or null if not set. Used by
+/// chat's conversation list and conversation screen to show real
+/// names instead of raw user ids.
+@riverpod
+Future<String?> displayName(Ref ref, String userId) async {
+  final result = await ref.read(userProfileRepositoryProvider).getDisplayName(userId);
+  return result.fold(onSuccess: (name) => name, onFailure: (_) => null);
 }

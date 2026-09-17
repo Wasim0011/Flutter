@@ -5,6 +5,7 @@ import 'package:samvaad/features/auth/domain/repositories/user_profile_repositor
 class FakeUserProfileRepository implements UserProfileRepository {
   final Map<String, CommunicationPreference> _preferences = {};
   final Map<String, String> _phoneNumbersByUserId = {};
+  final Map<String, String> _displayNames = {};
 
   @override
   Future<Result<void>> ensureUserDocument({
@@ -13,6 +14,20 @@ class FakeUserProfileRepository implements UserProfileRepository {
   }) async {
     _phoneNumbersByUserId[userId] = phoneNumber;
     return const Result.success(null);
+  }
+
+  @override
+  Future<Result<void>> saveDisplayName({
+    required String userId,
+    required String displayName,
+  }) async {
+    _displayNames[userId] = displayName;
+    return const Result.success(null);
+  }
+
+  @override
+  Future<Result<String?>> getDisplayName(String userId) async {
+    return Result.success(_displayNames[userId]);
   }
 
   @override
