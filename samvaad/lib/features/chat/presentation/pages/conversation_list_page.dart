@@ -85,10 +85,10 @@ class ConversationListPage extends ConsumerWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 onTap: () {
-                  // Conversation screen itself is Milestone 3.4 — for
-                  // now this is a no-op tap target, intentionally,
-                  // rather than a half-built navigation to a screen
-                  // that doesn't exist yet.
+                  context.push(
+                    AppRoutes.conversation,
+                    extra: {'conversationId': conversation.id, 'title': title},
+                  );
                 },
               );
             },

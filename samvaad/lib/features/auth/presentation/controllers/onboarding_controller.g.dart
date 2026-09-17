@@ -219,3 +219,106 @@ final class HasCompletedOnboardingFamily extends $Family
   @override
   String toString() => r'hasCompletedOnboardingProvider';
 }
+
+/// The current [CommunicationPreference] for [userId], or null if not
+/// yet set. Used by the chat feature (Milestone 3.4) to adapt message
+/// screen layout — larger text and live-region announcements for
+/// captionsFirst, denser layout for textFirst, and so on.
+
+@ProviderFor(communicationPreference)
+final communicationPreferenceProvider = CommunicationPreferenceFamily._();
+
+/// The current [CommunicationPreference] for [userId], or null if not
+/// yet set. Used by the chat feature (Milestone 3.4) to adapt message
+/// screen layout — larger text and live-region announcements for
+/// captionsFirst, denser layout for textFirst, and so on.
+
+final class CommunicationPreferenceProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<CommunicationPreference?>,
+          CommunicationPreference?,
+          FutureOr<CommunicationPreference?>
+        >
+    with
+        $FutureModifier<CommunicationPreference?>,
+        $FutureProvider<CommunicationPreference?> {
+  /// The current [CommunicationPreference] for [userId], or null if not
+  /// yet set. Used by the chat feature (Milestone 3.4) to adapt message
+  /// screen layout — larger text and live-region announcements for
+  /// captionsFirst, denser layout for textFirst, and so on.
+  CommunicationPreferenceProvider._({
+    required CommunicationPreferenceFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'communicationPreferenceProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$communicationPreferenceHash();
+
+  @override
+  String toString() {
+    return r'communicationPreferenceProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<CommunicationPreference?> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<CommunicationPreference?> create(Ref ref) {
+    final argument = this.argument as String;
+    return communicationPreference(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is CommunicationPreferenceProvider &&
+        other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$communicationPreferenceHash() =>
+    r'c4148139bc5a84a4d7ab34d1cb2b38db29b88918';
+
+/// The current [CommunicationPreference] for [userId], or null if not
+/// yet set. Used by the chat feature (Milestone 3.4) to adapt message
+/// screen layout — larger text and live-region announcements for
+/// captionsFirst, denser layout for textFirst, and so on.
+
+final class CommunicationPreferenceFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<CommunicationPreference?>, String> {
+  CommunicationPreferenceFamily._()
+    : super(
+        retry: null,
+        name: r'communicationPreferenceProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// The current [CommunicationPreference] for [userId], or null if not
+  /// yet set. Used by the chat feature (Milestone 3.4) to adapt message
+  /// screen layout — larger text and live-region announcements for
+  /// captionsFirst, denser layout for textFirst, and so on.
+
+  CommunicationPreferenceProvider call(String userId) =>
+      CommunicationPreferenceProvider._(argument: userId, from: this);
+
+  @override
+  String toString() => r'communicationPreferenceProvider';
+}

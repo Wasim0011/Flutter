@@ -1,6 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
+import '../../features/chat/presentation/pages/conversation_page.dart';
 import '../../features/auth/domain/entities/app_user.dart';
 import '../../features/auth/presentation/controllers/onboarding_controller.dart';
 import '../../features/auth/presentation/pages/onboarding_page.dart';
@@ -15,18 +15,7 @@ import 'app_routes.dart';
 
 part 'app_router.g.dart';
 
-/// Samvaad's declarative route table.
-///
-/// Watches `authStateChangesProvider` directly so Riverpod rebuilds
-/// this provider — and produces a fresh `GoRouter` whose `redirect`
-/// closes over already-resolved auth/onboarding state — whenever
-/// either changes.
-///
-/// Milestone 3.3 adds `home` as the true landing screen for a
-/// signed-in, onboarded user. `splash` is now purely the loading/
-/// decision screen shown only while auth or onboarding status is
-/// still being determined — a fully resolved user is always bounced
-/// off it toward `home`, never left there.
+
 @riverpod
 GoRouter appRouter(Ref ref) {
   final AsyncValue<AppUser?> authState = ref.watch(authStateChangesProvider);
@@ -119,6 +108,17 @@ GoRouter appRouter(Ref ref) {
         path: AppRoutes.createGroup,
         name: AppRoutes.createGroupName,
         builder: (context, state) => const CreateGroupPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.conversation,
+        name: AppRoutes.conversationName,
+        builder: (context, state) {
+          final extra = state.extra! as Map<String, String>;
+          return ConversationPage(
+            conversationId: extra['conversationId']!,
+            title: extra['title']!,
+          );
+        },
       ),
     ],
   );

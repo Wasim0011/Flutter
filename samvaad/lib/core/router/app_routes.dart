@@ -20,4 +20,7 @@ abstract final class AppRoutes {
 
   static const String createGroup = '/home/create-group';
   static const String createGroupName = 'createGroup';
+
+  static const String conversation = '/home/conversation';
+  static const String conversationName = 'conversation';
 }

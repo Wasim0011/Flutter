@@ -68,3 +68,13 @@ Future<bool> hasCompletedOnboarding(Ref ref, String userId) async {
     onFailure: (_) => false, // fail open to onboarding on error, not through it
   );
 }
+
+/// The current [CommunicationPreference] for [userId], or null if not
+/// yet set. Used by the chat feature (Milestone 3.4) to adapt message
+/// screen layout — larger text and live-region announcements for
+/// captionsFirst, denser layout for textFirst, and so on.
+@riverpod
+Future<CommunicationPreference?> communicationPreference(Ref ref, String userId) async {
+  final result = await ref.read(userProfileRepositoryProvider).getCommunicationPreference(userId);
+  return result.fold(onSuccess: (preference) => preference, onFailure: (_) => null);
+}

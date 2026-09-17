@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 import '../controllers/start_chat_controller.dart';
 
@@ -34,12 +35,13 @@ class _StartChatPageState extends ConsumerState<StartChatPage> {
 
     ref.listen<StartChatState>(startChatControllerProvider, (previous, next) {
       if (next is StartChatReady) {
-        // Milestone 3.4 will replace this with real navigation to the
-        // conversation screen. For now, confirm success and return.
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Chat ready.')),
+        context.pushReplacement(
+          AppRoutes.conversation,
+          extra: {
+            'conversationId': next.conversation.id,
+            'title': next.conversation.otherParticipantId(currentUserId ?? '') ?? 'Chat',
+          },
         );
-        context.pop();
       }
     });
 

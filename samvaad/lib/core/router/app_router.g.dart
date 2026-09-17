@@ -8,50 +8,13 @@ part of 'app_router.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Samvaad's declarative route table.
-///
-/// Watches `authStateChangesProvider` directly so Riverpod rebuilds
-/// this provider — and produces a fresh `GoRouter` whose `redirect`
-/// closes over already-resolved auth/onboarding state — whenever
-/// either changes.
-///
-/// Milestone 3.3 adds `home` as the true landing screen for a
-/// signed-in, onboarded user. `splash` is now purely the loading/
-/// decision screen shown only while auth or onboarding status is
-/// still being determined — a fully resolved user is always bounced
-/// off it toward `home`, never left there.
 
 @ProviderFor(appRouter)
 final appRouterProvider = AppRouterProvider._();
 
-/// Samvaad's declarative route table.
-///
-/// Watches `authStateChangesProvider` directly so Riverpod rebuilds
-/// this provider — and produces a fresh `GoRouter` whose `redirect`
-/// closes over already-resolved auth/onboarding state — whenever
-/// either changes.
-///
-/// Milestone 3.3 adds `home` as the true landing screen for a
-/// signed-in, onboarded user. `splash` is now purely the loading/
-/// decision screen shown only while auth or onboarding status is
-/// still being determined — a fully resolved user is always bounced
-/// off it toward `home`, never left there.
-
 final class AppRouterProvider
     extends $FunctionalProvider<GoRouter, GoRouter, GoRouter>
     with $Provider<GoRouter> {
-  /// Samvaad's declarative route table.
-  ///
-  /// Watches `authStateChangesProvider` directly so Riverpod rebuilds
-  /// this provider — and produces a fresh `GoRouter` whose `redirect`
-  /// closes over already-resolved auth/onboarding state — whenever
-  /// either changes.
-  ///
-  /// Milestone 3.3 adds `home` as the true landing screen for a
-  /// signed-in, onboarded user. `splash` is now purely the loading/
-  /// decision screen shown only while auth or onboarding status is
-  /// still being determined — a fully resolved user is always bounced
-  /// off it toward `home`, never left there.
   AppRouterProvider._()
     : super(
         from: null,
@@ -85,4 +48,4 @@ final class AppRouterProvider
   }
 }
 
-String _$appRouterHash() => r'd04723ad062e4a0085e97a6a7563c75509aaf99e';
+String _$appRouterHash() => r'9f83e144c53b90076841340511ad4a216e53eb10';

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 import '../controllers/create_group_controller.dart';
 
@@ -35,7 +36,13 @@ class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
 
     ref.listen<CreateGroupState>(createGroupControllerProvider, (previous, next) {
       if (next is CreateGroupReady) {
-        context.pop();
+        context.pushReplacement(
+          AppRoutes.conversation,
+          extra: {
+            'conversationId': next.conversation.id,
+            'title': next.conversation.title ?? 'Group',
+          },
+        );
       }
     });
 
