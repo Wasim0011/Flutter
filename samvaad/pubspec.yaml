@@ -17,6 +17,7 @@ dependencies:
   firebase_core_platform_interface: ^8.1.1
   firebase_auth: ^6.6.1
   cloud_firestore: ^6.9.0
+  livekit_client: ^2.13.0
 
 dev_dependencies:
   flutter_test:
