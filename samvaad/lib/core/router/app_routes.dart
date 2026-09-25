@@ -23,4 +23,9 @@ abstract final class AppRoutes {
 
   static const String conversation = '/home/conversation';
   static const String conversationName = 'conversation';
+
+  static const String incomingCall = '/call/incoming';
+  static const String incomingCallName = 'incomingCall';
+  static const String call = '/call';
+  static const String callName = 'call';
 }

@@ -12,6 +12,9 @@ import '../../features/chat/presentation/pages/create_group_page.dart';
 import '../../features/chat/presentation/pages/start_chat_page.dart';
 import '../../features/shell/presentation/pages/splash_page.dart';
 import 'app_routes.dart';
+import '../../features/calling/domain/entities/call.dart';
+import '../../features/calling/presentation/pages/call_page.dart';
+import '../../features/calling/presentation/pages/incoming_call_page.dart';
 
 part 'app_router.g.dart';
 
@@ -119,6 +122,16 @@ GoRouter appRouter(Ref ref) {
             title: extra['title']!,
           );
         },
+      ),
+      GoRoute(
+        path: AppRoutes.incomingCall,
+        name: AppRoutes.incomingCallName,
+        builder: (context, state) => IncomingCallPage(call: state.extra! as Call),
+      ),
+      GoRoute(
+        path: AppRoutes.call,
+        name: AppRoutes.callName,
+        builder: (context, state) => CallPage(call: state.extra! as Call),
       ),
     ],
   );
