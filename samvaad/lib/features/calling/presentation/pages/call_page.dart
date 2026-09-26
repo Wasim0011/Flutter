@@ -1,14 +1,19 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:livekit_client/livekit_client.dart';
 
+import '../../../auth/domain/entities/app_user.dart';
+import '../../../auth/presentation/controllers/onboarding_controller.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../domain/entities/call.dart';
 import '../controllers/call_session_controller.dart';
+import '../controllers/caption_controller.dart';
 
 /// In-call screen: video grid of all participants plus mute/camera/
-/// hangup controls. Joins the LiveKit room on entry.
+/// captions/hangup controls. Joins the LiveKit room on entry.
 class CallPage extends ConsumerStatefulWidget {
   const CallPage({required this.call, super.key});
 
@@ -23,9 +28,69 @@ class _CallPageState extends ConsumerState<CallPage> {
   bool _cameraOn = true;
   bool _joinTriggered = false;
 
+  CaptionSpeechService? _captionService;
+  bool _captionsSetupDone = false;
+
+  void _setupCaptions(Room room, String userId, CommunicationPreference? preference) {
+    if (_captionsSetupDone) return;
+    _captionsSetupDone = true;
+
+    // Default on for preferences where hearing the call audio may not
+    // be the primary channel — off by default otherwise, but always
+    // toggleable by anyone via the controls.
+    final bool defaultOn = preference == CommunicationPreference.captionsFirst ||
+        preference == CommunicationPreference.signLanguage;
+    ref.read(captionsEnabledProvider.notifier).set(defaultOn);
+
+    _captionService = CaptionSpeechService(
+      room: room,
+      localParticipantId: userId,
+      onLocalCaption: (line) => ref.read(captionFeedProvider.notifier).update(line),
+    );
+
+    // NOTE: this event-listener API (createListener/.on<DataReceivedEvent>)
+    // is the documented livekit_client pattern as of recent versions.
+    // If this doesn't match your installed version's API, paste the
+    // exact analyzer/runtime error and it'll be corrected precisely.
+    room.createListener().on<DataReceivedEvent>((event) {
+      try {
+        final Map<String, dynamic> data =
+        jsonDecode(utf8.decode(event.data)) as Map<String, dynamic>;
+        ref.read(captionFeedProvider.notifier).update(
+          CaptionLine(
+            participantId: data['senderId'] as String,
+            text: data['text'] as String,
+            isFinal: data['isFinal'] as bool,
+          ),
+        );
+      } catch (_) {
+        // Malformed/unexpected data payload — ignore rather than crash
+        // the call over a captions parsing issue.
+      }
+    });
+
+    if (defaultOn) {
+      _captionService?.start();
+    }
+  }
+
+  void _toggleCaptions(bool enabled) {
+    ref.read(captionsEnabledProvider.notifier).set(enabled);
+    if (enabled) {
+      _captionService?.start();
+    } else {
+      _captionService?.stop();
+    }
+  }
+
+  @override
+  void dispose() {
+    _captionService?.stop();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    // final ThemeData theme = Theme.of(context);
     final String? userId = ref.watch(authStateChangesProvider).value?.id;
     final CallSessionState state = ref.watch(callSessionControllerProvider);
 
@@ -39,6 +104,12 @@ class _CallPageState extends ConsumerState<CallPage> {
         );
       });
     }
+
+    final AsyncValue<CommunicationPreference?> preferenceAsync = userId == null
+        ? const AsyncValue.data(null)
+        : ref.watch(communicationPreferenceProvider(userId));
+    final bool captionsEnabled = ref.watch(captionsEnabledProvider);
+    final Map<String, CaptionLine> captions = ref.watch(captionFeedProvider);
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -57,34 +128,51 @@ class _CallPageState extends ConsumerState<CallPage> {
               ),
             ),
           ),
-          CallSessionConnected(:final room) => Stack(
-            children: [
-              _ParticipantGrid(room: room),
-              Positioned(
-                bottom: 24,
-                left: 0,
-                right: 0,
-                child: _CallControls(
-                  micOn: _micOn,
-                  cameraOn: _cameraOn,
-                  onToggleMic: () {
-                    setState(() => _micOn = !_micOn);
-                    ref.read(callSessionControllerProvider.notifier).toggleMicrophone(_micOn);
-                  },
-                  onToggleCamera: () {
-                    setState(() => _cameraOn = !_cameraOn);
-                    ref.read(callSessionControllerProvider.notifier).toggleCamera(_cameraOn);
-                  },
-                  onHangUp: () async {
-                    await ref
-                        .read(callSessionControllerProvider.notifier)
-                        .leave(widget.call.id);
-                    if (context.mounted) context.pop();
-                  },
+          CallSessionConnected(:final room) => () {
+            if (userId != null) {
+              _setupCaptions(room, userId, preferenceAsync.value);
+            }
+            return Stack(
+              children: [
+                _ParticipantGrid(room: room),
+                if (captionsEnabled && captions.isNotEmpty)
+                  Positioned(
+                    bottom: 110,
+                    left: 16,
+                    right: 16,
+                    child: Semantics(
+                      liveRegion: true,
+                      child: _CaptionsOverlay(captions: captions),
+                    ),
+                  ),
+                Positioned(
+                  bottom: 24,
+                  left: 0,
+                  right: 0,
+                  child: _CallControls(
+                    micOn: _micOn,
+                    cameraOn: _cameraOn,
+                    captionsOn: captionsEnabled,
+                    onToggleMic: () {
+                      setState(() => _micOn = !_micOn);
+                      ref.read(callSessionControllerProvider.notifier).toggleMicrophone(_micOn);
+                    },
+                    onToggleCamera: () {
+                      setState(() => _cameraOn = !_cameraOn);
+                      ref.read(callSessionControllerProvider.notifier).toggleCamera(_cameraOn);
+                    },
+                    onToggleCaptions: () => _toggleCaptions(!captionsEnabled),
+                    onHangUp: () async {
+                      await ref
+                          .read(callSessionControllerProvider.notifier)
+                          .leave(widget.call.id);
+                      if (context.mounted) context.pop();
+                    },
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            );
+          }(),
         },
       ),
     );
@@ -138,19 +226,54 @@ class _ParticipantTile extends StatelessWidget {
   }
 }
 
+class _CaptionsOverlay extends StatelessWidget {
+  const _CaptionsOverlay({required this.captions});
+
+  final Map<String, CaptionLine> captions;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<CaptionLine> lines = captions.values.toList();
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: lines
+            .map((line) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Text(
+            line.text,
+            style: const TextStyle(color: Colors.white, fontSize: 18),
+          ),
+        ))
+            .toList(),
+      ),
+    );
+  }
+}
+
 class _CallControls extends StatelessWidget {
   const _CallControls({
     required this.micOn,
     required this.cameraOn,
+    required this.captionsOn,
     required this.onToggleMic,
     required this.onToggleCamera,
+    required this.onToggleCaptions,
     required this.onHangUp,
   });
 
   final bool micOn;
   final bool cameraOn;
+  final bool captionsOn;
   final VoidCallback onToggleMic;
   final VoidCallback onToggleCamera;
+  final VoidCallback onToggleCaptions;
   final VoidCallback onHangUp;
 
   @override
@@ -162,6 +285,11 @@ class _CallControls extends StatelessWidget {
           icon: micOn ? Icons.mic : Icons.mic_off,
           label: micOn ? 'Mute' : 'Unmute',
           onPressed: onToggleMic,
+        ),
+        _ControlButton(
+          icon: captionsOn ? Icons.closed_caption : Icons.closed_caption_off,
+          label: captionsOn ? 'Hide captions' : 'Show captions',
+          onPressed: onToggleCaptions,
         ),
         _ControlButton(
           icon: Icons.call_end,

@@ -5,14 +5,9 @@ import 'package:go_router/go_router.dart';
 
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'features/calling/presentation/widgets/incoming_call_gate.dart';
 import 'firebase_options.dart';
 
-/// Single place where app startup concerns are wired together.
-/// Firebase must be initialized before `runApp`, since providers and
-/// screens further down the tree assume it's already available —
-/// there's no "loading" state for Firebase.initializeApp() itself at
-/// this layer; if it fails, we want that to surface immediately and
-/// loudly during development, not be silently swallowed.
 Future<void> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -23,16 +18,6 @@ Future<void> bootstrap() async {
   runApp(const ProviderScope(child: SamvaadApp()));
 }
 
-/// Root widget for Samvaad.
-///
-/// Now a ConsumerWidget (was StatelessWidget) because the router
-/// itself became a Riverpod provider in Milestone 2.6 — `appRouter`
-/// (a plain top-level GoRouter) no longer exists; `appRouterProvider`
-/// replaces it so `redirect` can react to live auth state. Watching it
-/// here means MaterialApp.router rebuilds with a fresh GoRouter only
-/// if the provider itself is ever recreated (it won't be, in normal
-/// operation) — auth-driven redirects happen inside GoRouter via its
-/// own refreshListenable, not by rebuilding this widget.
 class SamvaadApp extends ConsumerWidget {
   const SamvaadApp({super.key});
 
@@ -47,6 +32,10 @@ class SamvaadApp extends ConsumerWidget {
       darkTheme: AppTheme.dark(),
       themeMode: ThemeMode.system,
       routerConfig: router,
+      // IncomingCallGate wraps the routed content so an incoming call
+      // can interrupt whatever screen the user is on — chat, home,
+      // anywhere — without each screen needing its own listener.
+      builder: (context, child) => IncomingCallGate(child: child!),
     );
   }
 }
