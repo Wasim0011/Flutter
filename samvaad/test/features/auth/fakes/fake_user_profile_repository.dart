@@ -6,6 +6,7 @@ class FakeUserProfileRepository implements UserProfileRepository {
   final Map<String, CommunicationPreference> _preferences = {};
   final Map<String, String> _phoneNumbersByUserId = {};
   final Map<String, String> _displayNames = {};
+  final Map<String, String> _bios = {};
 
   @override
   Future<Result<void>> ensureUserDocument({
@@ -28,6 +29,17 @@ class FakeUserProfileRepository implements UserProfileRepository {
   @override
   Future<Result<String?>> getDisplayName(String userId) async {
     return Result.success(_displayNames[userId]);
+  }
+
+  @override
+  Future<Result<void>> saveBio({required String userId, required String bio}) async {
+    _bios[userId] = bio;
+    return const Result.success(null);
+  }
+
+  @override
+  Future<Result<String?>> getBio(String userId) async {
+    return Result.success(_bios[userId]);
   }
 
   @override

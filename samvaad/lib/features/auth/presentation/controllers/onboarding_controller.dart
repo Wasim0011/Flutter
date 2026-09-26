@@ -101,3 +101,11 @@ Future<String?> displayName(Ref ref, String userId) async {
   final result = await ref.read(userProfileRepositoryProvider).getDisplayName(userId);
   return result.fold(onSuccess: (name) => name, onFailure: (_) => null);
 }
+
+/// The stored bio for [userId], or null if not set. Used by the
+/// community feature's public profile screen (Milestone 5.2).
+@riverpod
+Future<String?> bio(Ref ref, String userId) async {
+  final result = await ref.read(userProfileRepositoryProvider).getBio(userId);
+  return result.fold(onSuccess: (bio) => bio, onFailure: (_) => null);
+}

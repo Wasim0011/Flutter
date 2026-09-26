@@ -26,4 +26,11 @@ abstract interface class UserProfileRepository {
   Future<Result<CommunicationPreference?>> getCommunicationPreference(String userId);
 
   Future<Result<String?>> findUserIdByPhoneNumber(String phoneNumber);
+
+  /// Saves a short, user-written bio, shown on their public profile
+  /// (Milestone 5.2). Optional — a user may never set one.
+  Future<Result<void>> saveBio({required String userId, required String bio});
+
+  /// Returns the stored bio for [userId], or null if not set.
+  Future<Result<String?>> getBio(String userId);
 }

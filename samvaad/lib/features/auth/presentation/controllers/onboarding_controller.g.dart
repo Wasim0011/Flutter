@@ -361,3 +361,84 @@ final class DisplayNameFamily extends $Family
   @override
   String toString() => r'displayNameProvider';
 }
+
+/// The stored bio for [userId], or null if not set. Used by the
+/// community feature's public profile screen (Milestone 5.2).
+
+@ProviderFor(bio)
+final bioProvider = BioFamily._();
+
+/// The stored bio for [userId], or null if not set. Used by the
+/// community feature's public profile screen (Milestone 5.2).
+
+final class BioProvider
+    extends $FunctionalProvider<AsyncValue<String?>, String?, FutureOr<String?>>
+    with $FutureModifier<String?>, $FutureProvider<String?> {
+  /// The stored bio for [userId], or null if not set. Used by the
+  /// community feature's public profile screen (Milestone 5.2).
+  BioProvider._({required BioFamily super.from, required String super.argument})
+    : super(
+        retry: null,
+        name: r'bioProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$bioHash();
+
+  @override
+  String toString() {
+    return r'bioProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<String?> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<String?> create(Ref ref) {
+    final argument = this.argument as String;
+    return bio(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is BioProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$bioHash() => r'3a32687cd54982440684809172ede212fd20a957';
+
+/// The stored bio for [userId], or null if not set. Used by the
+/// community feature's public profile screen (Milestone 5.2).
+
+final class BioFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<String?>, String> {
+  BioFamily._()
+    : super(
+        retry: null,
+        name: r'bioProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// The stored bio for [userId], or null if not set. Used by the
+  /// community feature's public profile screen (Milestone 5.2).
+
+  BioProvider call(String userId) =>
+      BioProvider._(argument: userId, from: this);
+
+  @override
+  String toString() => r'bioProvider';
+}

@@ -97,4 +97,24 @@ class FirestoreUserProfileRepository implements UserProfileRepository {
       return Result.failure(Failure.unexpected(e.toString()));
     }
   }
+
+  @override
+  Future<Result<void>> saveBio({required String userId, required String bio}) async {
+    try {
+      await _users.doc(userId).set({'bio': bio}, SetOptions(merge: true));
+      return const Result.success(null);
+    } catch (e) {
+      return Result.failure(Failure.unexpected(e.toString()));
+    }
+  }
+
+  @override
+  Future<Result<String?>> getBio(String userId) async {
+    try {
+      final doc = await _users.doc(userId).get();
+      return Result.success(doc.data()?['bio'] as String?);
+    } catch (e) {
+      return Result.failure(Failure.unexpected(e.toString()));
+    }
+  }
 }
