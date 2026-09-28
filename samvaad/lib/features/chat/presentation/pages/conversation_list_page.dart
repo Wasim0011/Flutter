@@ -32,6 +32,11 @@ class ConversationListPage extends ConsumerWidget {
         title: const Text('Samvaad'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.people_outline),
+            tooltip: 'Community',
+            onPressed: () => context.push(AppRoutes.community),
+          ),
+          IconButton(
             icon: const Icon(Icons.group_add_outlined),
             tooltip: 'New group',
             onPressed: () => context.push(AppRoutes.createGroup),

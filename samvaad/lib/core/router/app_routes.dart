@@ -28,4 +28,13 @@ abstract final class AppRoutes {
   static const String incomingCallName = 'incomingCall';
   static const String call = '/call';
   static const String callName = 'call';
+
+  static const String community = '/community';
+  static const String communityName = 'community';
+  static const String publicProfile = '/community/profile';
+  static const String publicProfileName = 'publicProfile';
+  static const String groupDetail = '/community/group';
+  static const String groupDetailName = 'groupDetail';
+  static const String editProfile = '/community/edit-profile';
+  static const String editProfileName = 'editProfile';
 }

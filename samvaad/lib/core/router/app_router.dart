@@ -15,6 +15,11 @@ import 'app_routes.dart';
 import '../../features/calling/domain/entities/call.dart';
 import '../../features/calling/presentation/pages/call_page.dart';
 import '../../features/calling/presentation/pages/incoming_call_page.dart';
+import '../../features/auth/presentation/pages/edit_profile_page.dart';
+import '../../features/community/domain/entities/community_group.dart';
+import '../../features/community/presentation/pages/community_home_page.dart';
+import '../../features/community/presentation/pages/group_detail_page.dart';
+import '../../features/community/presentation/pages/public_profile_page.dart';
 
 part 'app_router.g.dart';
 
@@ -132,6 +137,26 @@ GoRouter appRouter(Ref ref) {
         path: AppRoutes.call,
         name: AppRoutes.callName,
         builder: (context, state) => CallPage(call: state.extra! as Call),
+      ),
+      GoRoute(
+        path: AppRoutes.community,
+        name: AppRoutes.communityName,
+        builder: (context, state) => const CommunityHomePage(),
+      ),
+      GoRoute(
+        path: AppRoutes.publicProfile,
+        name: AppRoutes.publicProfileName,
+        builder: (context, state) => PublicProfilePage(userId: state.extra! as String),
+      ),
+      GoRoute(
+        path: AppRoutes.groupDetail,
+        name: AppRoutes.groupDetailName,
+        builder: (context, state) => GroupDetailPage(group: state.extra! as CommunityGroup),
+      ),
+      GoRoute(
+        path: AppRoutes.editProfile,
+        name: AppRoutes.editProfileName,
+        builder: (context, state) => const EditProfilePage(),
       ),
     ],
   );
