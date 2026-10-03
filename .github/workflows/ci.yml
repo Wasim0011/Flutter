@@ -10,6 +10,11 @@ jobs:
   analyze_and_test:
     name: Analyze & Test
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: samvaad
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,7 +29,7 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Generate code (Riverpod/build_runner)
+      - name: Generate code
         run: dart run build_runner build --delete-conflicting-outputs
 
       - name: Verify formatting
