@@ -46,3 +46,7 @@ app.*.map.json
 
 # Firebase — environment-specific, regenerated per machine via `flutterfire configure`
 /android/app/google-services.json
+
+# Release signing — never commit real credentials
+android/key.properties
+android/app/samvaad-release.jks
