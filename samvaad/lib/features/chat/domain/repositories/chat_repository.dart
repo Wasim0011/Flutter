@@ -34,6 +34,12 @@ abstract interface class ChatRepository {
     required String title,
   });
 
+  /// Fetches a single conversation by id, used when something needs
+  /// its full participant list (e.g. initiating a call from the
+  /// conversation screen) without subscribing to the whole
+  /// conversation-list stream just for one lookup.
+  Future<Result<Conversation>> getConversationById(String conversationId);
+
   /// Sends a text message into [conversationId].
   Future<Result<void>> sendMessage({
     required String conversationId,

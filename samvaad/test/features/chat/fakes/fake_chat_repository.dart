@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:samvaad/core/error/failure.dart';
 import 'package:samvaad/core/error/result.dart';
 import 'package:samvaad/features/chat/domain/entities/conversation.dart';
 import 'package:samvaad/features/chat/domain/entities/message.dart';
@@ -97,6 +98,15 @@ class FakeChatRepository implements ChatRepository {
     );
     _conversations[conversation.id] = conversation;
     _emitConversations();
+    return Result.success(conversation);
+  }
+
+  @override
+  Future<Result<Conversation>> getConversationById(String conversationId) async {
+    final conversation = _conversations[conversationId];
+    if (conversation == null) {
+      return const Result.failure(Failure.unexpected('Conversation not found.'));
+    }
     return Result.success(conversation);
   }
 

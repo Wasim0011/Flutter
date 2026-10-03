@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../../../../core/error/failure.dart';
 import '../../../../core/error/result.dart';
 import '../../domain/entities/conversation.dart';
@@ -125,6 +124,19 @@ class FirestoreChatRepository implements ChatRepository {
   }
 
   @override
+  Future<Result<Conversation>> getConversationById(String conversationId) async {
+    try {
+      final doc = await _conversations.doc(conversationId).get();
+      if (!doc.exists) {
+        return const Result.failure(Failure.unexpected('Conversation not found.'));
+      }
+      return Result.success(_conversationFromDoc(doc));
+    } catch (e) {
+      return Result.failure(Failure.unexpected(e.toString()));
+    }
+  }
+
+  @override
   Future<Result<void>> sendMessage({
     required String conversationId,
     required String senderId,
@@ -158,10 +170,8 @@ class FirestoreChatRepository implements ChatRepository {
     }
   }
 
-  Conversation _conversationFromDoc(
-    QueryDocumentSnapshot<Map<String, dynamic>> doc,
-  ) {
-    final data = doc.data();
+  Conversation _conversationFromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
+    final data = doc.data()!;
     return Conversation(
       id: doc.id,
       type: ConversationType.values.firstWhere((t) => t.name == data['type']),

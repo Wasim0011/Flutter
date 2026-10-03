@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/router/app_routes.dart';
 import '../../../auth/domain/entities/app_user.dart';
 import '../../../auth/presentation/controllers/onboarding_controller.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
+import '../../../calling/presentation/providers/call_providers.dart';
 import '../../domain/entities/message.dart';
 import '../controllers/message_thread_controller.dart';
+import '../providers/chat_providers.dart';
 import '../widgets/chat_display_style.dart';
 
 /// The messaging screen for one conversation. Layout adapts to the
@@ -39,11 +44,42 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
     ref
         .read(sendMessageControllerProvider.notifier)
         .send(
-          conversationId: widget.conversationId,
-          senderId: currentUserId,
-          text: text,
-        );
+      conversationId: widget.conversationId,
+      senderId: currentUserId,
+      text: text,
+    );
     _textController.clear();
+  }
+
+  Future<void> _startCall(String currentUserId) async {
+    final conversationResult =
+    await ref.read(chatRepositoryProvider).getConversationById(widget.conversationId);
+
+    if (!mounted) return;
+
+    conversationResult.fold(
+      onSuccess: (conversation) async {
+        final calleeIds =
+        conversation.participantIds.where((id) => id != currentUserId).toList();
+        final callResult = await ref.read(callRepositoryProvider).startCall(
+          callerId: currentUserId,
+          calleeIds: calleeIds,
+          conversationId: widget.conversationId,
+        );
+
+        if (!mounted) return;
+
+        callResult.fold(
+          onSuccess: (call) => context.push(AppRoutes.call, extra: call),
+          onFailure: (failure) => ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Couldn\'t start call: ${failure.message}')),
+          ),
+        );
+      },
+      onFailure: (failure) => ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Couldn\'t start call: ${failure.message}')),
+      ),
+    );
   }
 
   @override
@@ -68,9 +104,9 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
     final SendMessageState sendState = ref.watch(sendMessageControllerProvider);
 
     ref.listen<SendMessageState>(sendMessageControllerProvider, (
-      previous,
-      next,
-    ) {
+        previous,
+        next,
+        ) {
       if (next is SendMessageFailed && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Couldn\'t send: ${next.message}')),
@@ -79,7 +115,16 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
     });
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(
+        title: Text(widget.title),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.video_call_outlined),
+            tooltip: 'Start call',
+            onPressed: () => _startCall(currentUserId),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Expanded(
@@ -206,7 +251,7 @@ class _MessageBubble extends StatelessWidget {
               message.text,
               style: theme.textTheme.bodyLarge?.copyWith(
                 fontSize:
-                    (theme.textTheme.bodyLarge?.fontSize ?? 17) *
+                (theme.textTheme.bodyLarge?.fontSize ?? 17) *
                     style.fontScale,
               ),
             ),
