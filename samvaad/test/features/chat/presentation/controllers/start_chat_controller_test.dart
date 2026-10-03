@@ -42,21 +42,28 @@ void main() {
   });
 
   test('succeeds when the phone number matches a known user', () async {
-    await container.read(startChatControllerProvider.notifier).startChatWithPhoneNumber(
-      currentUserId: currentUserId,
-      phoneNumber: otherPhoneNumber,
-    );
+    await container
+        .read(startChatControllerProvider.notifier)
+        .startChatWithPhoneNumber(
+          currentUserId: currentUserId,
+          phoneNumber: otherPhoneNumber,
+        );
 
     final state = container.read(startChatControllerProvider);
     expect(state, isA<StartChatReady>());
-    expect((state as StartChatReady).conversation.participantIds, contains(otherUserId));
+    expect(
+      (state as StartChatReady).conversation.participantIds,
+      contains(otherUserId),
+    );
   });
 
   test('fails when no user matches the phone number', () async {
-    await container.read(startChatControllerProvider.notifier).startChatWithPhoneNumber(
-      currentUserId: currentUserId,
-      phoneNumber: '+910000000000',
-    );
+    await container
+        .read(startChatControllerProvider.notifier)
+        .startChatWithPhoneNumber(
+          currentUserId: currentUserId,
+          phoneNumber: '+910000000000',
+        );
 
     expect(container.read(startChatControllerProvider), isA<StartChatFailed>());
   });
@@ -67,19 +74,23 @@ void main() {
       phoneNumber: '+919999999999',
     );
 
-    await container.read(startChatControllerProvider.notifier).startChatWithPhoneNumber(
-      currentUserId: currentUserId,
-      phoneNumber: '+919999999999',
-    );
+    await container
+        .read(startChatControllerProvider.notifier)
+        .startChatWithPhoneNumber(
+          currentUserId: currentUserId,
+          phoneNumber: '+919999999999',
+        );
 
     expect(container.read(startChatControllerProvider), isA<StartChatFailed>());
   });
 
   test('reset() returns to idle', () async {
-    await container.read(startChatControllerProvider.notifier).startChatWithPhoneNumber(
-      currentUserId: currentUserId,
-      phoneNumber: otherPhoneNumber,
-    );
+    await container
+        .read(startChatControllerProvider.notifier)
+        .startChatWithPhoneNumber(
+          currentUserId: currentUserId,
+          phoneNumber: otherPhoneNumber,
+        );
     container.read(startChatControllerProvider.notifier).reset();
 
     expect(container.read(startChatControllerProvider), isA<StartChatIdle>());

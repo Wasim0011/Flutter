@@ -49,7 +49,9 @@ class _PhoneEntryPageState extends ConsumerState<PhoneEntryPage> {
 
   void _submit() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    ref.read(phoneEntryControllerProvider.notifier).submit(_phoneController.text.trim());
+    ref
+        .read(phoneEntryControllerProvider.notifier)
+        .submit(_phoneController.text.trim());
   }
 
   @override
@@ -70,7 +72,9 @@ class _PhoneEntryPageState extends ConsumerState<PhoneEntryPage> {
     final ThemeData theme = Theme.of(context);
     final PhoneEntryState state = ref.watch(phoneEntryControllerProvider);
     final bool isSubmitting = state is PhoneEntrySubmitting;
-    final String? errorMessage = state is PhoneEntryFailed ? state.message : null;
+    final String? errorMessage = state is PhoneEntryFailed
+        ? state.message
+        : null;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Sign in')),
@@ -98,7 +102,8 @@ class _PhoneEntryPageState extends ConsumerState<PhoneEntryPage> {
                 ),
                 const SizedBox(height: 32),
                 Semantics(
-                  label: 'Phone number, include country code, example plus '
+                  label:
+                      'Phone number, include country code, example plus '
                       'nine one nine eight seven six five four three two one',
                   child: TextFormField(
                     controller: _phoneController,
@@ -138,10 +143,10 @@ class _PhoneEntryPageState extends ConsumerState<PhoneEntryPage> {
                     onPressed: isSubmitting ? null : _submit,
                     child: isSubmitting
                         ? const SizedBox(
-                      height: 22,
-                      width: 22,
-                      child: CircularProgressIndicator(strokeWidth: 2.5),
-                    )
+                            height: 22,
+                            width: 22,
+                            child: CircularProgressIndicator(strokeWidth: 2.5),
+                          )
                         : const Text('Send code'),
                   ),
                 ),

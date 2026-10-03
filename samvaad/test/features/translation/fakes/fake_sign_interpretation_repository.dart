@@ -8,10 +8,16 @@ class FakeSignInterpretationRepository implements SignInterpretationRepository {
   Failure? nextFailure;
 
   @override
-  Future<Result<SignInterpretation>> interpretFrame(List<int> imageBytes) async {
+  Future<Result<SignInterpretation>> interpretFrame(
+    List<int> imageBytes,
+  ) async {
     if (nextFailure != null) return Result.failure(nextFailure!);
     return Result.success(
-      nextResult ?? const SignInterpretation(text: '', confidence: InterpretationConfidence.low),
+      nextResult ??
+          const SignInterpretation(
+            text: '',
+            confidence: InterpretationConfidence.low,
+          ),
     );
   }
 }

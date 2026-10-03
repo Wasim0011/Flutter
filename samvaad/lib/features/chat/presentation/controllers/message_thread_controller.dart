@@ -42,11 +42,13 @@ class SendMessageController extends _$SendMessageController {
 
     state = const SendMessageSending();
 
-    final result = await ref.read(chatRepositoryProvider).sendMessage(
-      conversationId: conversationId,
-      senderId: senderId,
-      text: text.trim(),
-    );
+    final result = await ref
+        .read(chatRepositoryProvider)
+        .sendMessage(
+          conversationId: conversationId,
+          senderId: senderId,
+          text: text.trim(),
+        );
 
     state = result.fold(
       onSuccess: (_) => const SendMessageIdle(),

@@ -36,11 +36,13 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
   void _send(String currentUserId) {
     final String text = _textController.text;
     if (text.trim().isEmpty) return;
-    ref.read(sendMessageControllerProvider.notifier).send(
-      conversationId: widget.conversationId,
-      senderId: currentUserId,
-      text: text,
-    );
+    ref
+        .read(sendMessageControllerProvider.notifier)
+        .send(
+          conversationId: widget.conversationId,
+          senderId: currentUserId,
+          text: text,
+        );
     _textController.clear();
   }
 
@@ -53,16 +55,22 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final AsyncValue<CommunicationPreference?> preferenceAsync =
-    ref.watch(communicationPreferenceProvider(currentUserId));
-    final ChatDisplayStyle style =
-    ChatDisplayStyle.forPreference(preferenceAsync.value);
+    final AsyncValue<CommunicationPreference?> preferenceAsync = ref.watch(
+      communicationPreferenceProvider(currentUserId),
+    );
+    final ChatDisplayStyle style = ChatDisplayStyle.forPreference(
+      preferenceAsync.value,
+    );
 
-    final AsyncValue<List<Message>> messagesAsync =
-    ref.watch(messageThreadProvider(widget.conversationId));
+    final AsyncValue<List<Message>> messagesAsync = ref.watch(
+      messageThreadProvider(widget.conversationId),
+    );
     final SendMessageState sendState = ref.watch(sendMessageControllerProvider);
 
-    ref.listen<SendMessageState>(sendMessageControllerProvider, (previous, next) {
+    ref.listen<SendMessageState>(sendMessageControllerProvider, (
+      previous,
+      next,
+    ) {
       if (next is SendMessageFailed && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Couldn\'t send: ${next.message}')),
@@ -80,7 +88,9 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
               error: (error, stackTrace) => Center(
                 child: Text(
                   'Couldn\'t load messages.',
-                  style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.error),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.error,
+                  ),
                 ),
               ),
               data: (messages) {
@@ -98,7 +108,8 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
                 // keeps it there as new messages arrive — the standard
                 // chat-list pattern, and simpler/more robust than
                 // manually driving a ScrollController on every update.
-                final List<Message> reversedMessages = messages.reversed.toList();
+                final List<Message> reversedMessages = messages.reversed
+                    .toList();
                 return ListView.builder(
                   reverse: true,
                   padding: const EdgeInsets.all(16),
@@ -171,15 +182,18 @@ class _MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final Color bubbleColor =
-    isMine ? theme.colorScheme.primaryContainer : theme.colorScheme.surfaceContainerHigh;
+    final Color bubbleColor = isMine
+        ? theme.colorScheme.primaryContainer
+        : theme.colorScheme.surfaceContainerHigh;
 
     return Align(
       alignment: isMine ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.75,
+        ),
         decoration: BoxDecoration(
           color: bubbleColor,
           borderRadius: BorderRadius.circular(16),
@@ -191,7 +205,9 @@ class _MessageBubble extends StatelessWidget {
             Text(
               message.text,
               style: theme.textTheme.bodyLarge?.copyWith(
-                fontSize: (theme.textTheme.bodyLarge?.fontSize ?? 17) * style.fontScale,
+                fontSize:
+                    (theme.textTheme.bodyLarge?.fontSize ?? 17) *
+                    style.fontScale,
               ),
             ),
             if (style.showTimestamps) ...[

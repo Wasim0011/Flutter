@@ -50,14 +50,20 @@ class FakeCallRepository implements CallRepository {
   }
 
   @override
-  Future<Result<void>> markJoined({required String callId, required String userId}) async {
+  Future<Result<void>> markJoined({
+    required String callId,
+    required String userId,
+  }) async {
     _calls[callId] = _withStatus(callId, CallStatus.active);
     _emit();
     return const Result.success(null);
   }
 
   @override
-  Future<Result<void>> decline({required String callId, required String userId}) async {
+  Future<Result<void>> decline({
+    required String callId,
+    required String userId,
+  }) async {
     _calls[callId] = _withStatus(callId, CallStatus.declined);
     _emit();
     return const Result.success(null);
@@ -74,15 +80,19 @@ class FakeCallRepository implements CallRepository {
   Stream<List<Call>> watchIncomingAndActiveCalls(String userId) {
     return Stream<List<Call>>.multi((controller) {
       controller.add(_currentFor(userId));
-      final sub = _controller.stream.listen((_) => controller.add(_currentFor(userId)));
+      final sub = _controller.stream.listen(
+        (_) => controller.add(_currentFor(userId)),
+      );
       controller.onCancel = sub.cancel;
     });
   }
 
   List<Call> _currentFor(String userId) => _calls.values
-      .where((c) =>
-  c.participantIds.contains(userId) &&
-      (c.status == CallStatus.ringing || c.status == CallStatus.active))
+      .where(
+        (c) =>
+            c.participantIds.contains(userId) &&
+            (c.status == CallStatus.ringing || c.status == CallStatus.active),
+      )
       .toList();
 
   @override
@@ -91,7 +101,9 @@ class FakeCallRepository implements CallRepository {
     required String userId,
   }) async {
     if (tokenGenerationShouldFail) {
-      return const Result.failure(Failure.unexpected('Token generation failed.'));
+      return const Result.failure(
+        Failure.unexpected('Token generation failed.'),
+      );
     }
     return Result.success('fake-token-for-$userId-in-$roomName');
   }

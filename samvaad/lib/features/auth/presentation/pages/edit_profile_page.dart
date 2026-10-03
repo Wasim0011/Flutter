@@ -41,7 +41,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final AsyncValue<String?> nameAsync = ref.watch(displayNameProvider(userId));
+    final AsyncValue<String?> nameAsync = ref.watch(
+      displayNameProvider(userId),
+    );
     final AsyncValue<String?> bioAsync = ref.watch(bioProvider(userId));
     if (nameAsync.hasValue && bioAsync.hasValue) {
       _prefillIfNeeded(nameAsync.value, bioAsync.value);
@@ -50,7 +52,10 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     final EditProfileState state = ref.watch(editProfileControllerProvider);
     final bool isSubmitting = state is EditProfileSubmitting;
 
-    ref.listen<EditProfileState>(editProfileControllerProvider, (previous, next) {
+    ref.listen<EditProfileState>(editProfileControllerProvider, (
+      previous,
+      next,
+    ) {
       if (next is EditProfileSuccess && context.mounted) {
         context.pop();
       }
@@ -87,7 +92,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                     padding: const EdgeInsets.only(bottom: 16),
                     child: Text(
                       state.message,
-                      style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.error),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.error,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -95,17 +102,19 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               ElevatedButton(
                 onPressed: isSubmitting
                     ? null
-                    : () => ref.read(editProfileControllerProvider.notifier).submit(
-                  userId: userId,
-                  displayName: _nameController.text,
-                  bio: _bioController.text,
-                ),
+                    : () => ref
+                          .read(editProfileControllerProvider.notifier)
+                          .submit(
+                            userId: userId,
+                            displayName: _nameController.text,
+                            bio: _bioController.text,
+                          ),
                 child: isSubmitting
                     ? const SizedBox(
-                  height: 22,
-                  width: 22,
-                  child: CircularProgressIndicator(strokeWidth: 2.5),
-                )
+                        height: 22,
+                        width: 22,
+                        child: CircularProgressIndicator(strokeWidth: 2.5),
+                      )
                     : const Text('Save'),
               ),
             ],

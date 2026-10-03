@@ -37,11 +37,11 @@ class AppUser {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          (other is AppUser &&
-              other.id == id &&
-              other.phoneNumber == phoneNumber &&
-              other.displayName == displayName &&
-              other.communicationPreference == communicationPreference);
+      (other is AppUser &&
+          other.id == id &&
+          other.phoneNumber == phoneNumber &&
+          other.displayName == displayName &&
+          other.communicationPreference == communicationPreference);
 
   @override
   int get hashCode =>
@@ -50,7 +50,7 @@ class AppUser {
   @override
   String toString() =>
       'AppUser(id: $id, phoneNumber: $phoneNumber, displayName: $displayName, '
-          'communicationPreference: $communicationPreference)';
+      'communicationPreference: $communicationPreference)';
 }
 
 /// How a user prefers to communicate within Samvaad.

@@ -9,7 +9,8 @@ import 'package:livekit_client/livekit_client.dart';
 /// entirely), this is the only file that would need to change.
 class LiveKitRoomService {
   Room? _room;
-  Room get room => _room ?? (throw StateError('Not connected — call connect() first.'));
+  Room get room =>
+      _room ?? (throw StateError('Not connected — call connect() first.'));
 
   bool get isConnected => _room != null;
 

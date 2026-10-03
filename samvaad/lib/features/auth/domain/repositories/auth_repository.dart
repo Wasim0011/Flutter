@@ -48,8 +48,8 @@ class PhoneVerificationSent {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          (other is PhoneVerificationSent &&
-              other.verificationId == verificationId);
+      (other is PhoneVerificationSent &&
+          other.verificationId == verificationId);
 
   @override
   int get hashCode => verificationId.hashCode;

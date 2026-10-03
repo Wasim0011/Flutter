@@ -25,26 +25,31 @@ void main() {
   });
 
   group('verifyOtp', () {
-    test('succeeds with the correct OTP and emits the signed-in user', () async {
-      final authStates = <dynamic>[];
-      final sub = repository.authStateChanges().listen(authStates.add);
-      await Future<void>.delayed(Duration.zero); // let the initial emission land
+    test(
+      'succeeds with the correct OTP and emits the signed-in user',
+      () async {
+        final authStates = <dynamic>[];
+        final sub = repository.authStateChanges().listen(authStates.add);
+        await Future<void>.delayed(
+          Duration.zero,
+        ); // let the initial emission land
 
-      final result = await repository.verifyOtp(
-        verificationId: 'fake-verification-id',
-        otp: '123456',
-      );
+        final result = await repository.verifyOtp(
+          verificationId: 'fake-verification-id',
+          otp: '123456',
+        );
 
-      expect(result.isSuccess, isTrue);
-      await Future<void>.delayed(Duration.zero);
+        expect(result.isSuccess, isTrue);
+        await Future<void>.delayed(Duration.zero);
 
-      // A new listener gets the current state (null) immediately —
-      // mirroring real Firebase Auth — so we assert on the most
-      // recent emission rather than an exact event count.
-      expect(authStates.last, isNotNull);
+        // A new listener gets the current state (null) immediately —
+        // mirroring real Firebase Auth — so we assert on the most
+        // recent emission rather than an exact event count.
+        expect(authStates.last, isNotNull);
 
-      await sub.cancel();
-    });
+        await sub.cancel();
+      },
+    );
 
     test('fails with an incorrect OTP', () async {
       final result = await repository.verifyOtp(

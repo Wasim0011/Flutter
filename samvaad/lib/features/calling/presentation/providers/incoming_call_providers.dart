@@ -14,9 +14,15 @@ part 'incoming_call_providers.g.dart';
 /// already connected.
 @riverpod
 Stream<Call?> nextIncomingCall(Ref ref, String userId) {
-  return ref.watch(callRepositoryProvider).watchIncomingAndActiveCalls(userId).map((calls) {
-    final List<Call> ringingForMe =
-    calls.where((c) => c.status == CallStatus.ringing && c.callerId != userId).toList();
-    return ringingForMe.isEmpty ? null : ringingForMe.first;
-  });
+  return ref
+      .watch(callRepositoryProvider)
+      .watchIncomingAndActiveCalls(userId)
+      .map((calls) {
+        final List<Call> ringingForMe = calls
+            .where(
+              (c) => c.status == CallStatus.ringing && c.callerId != userId,
+            )
+            .toList();
+        return ringingForMe.isEmpty ? null : ringingForMe.first;
+      });
 }

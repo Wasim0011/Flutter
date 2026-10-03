@@ -35,7 +35,9 @@ class _IncomingCallPageState extends ConsumerState<IncomingCallPage> {
 
     if (!granted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Camera and microphone access are required to join.')),
+        const SnackBar(
+          content: Text('Camera and microphone access are required to join.'),
+        ),
       );
       return;
     }
@@ -44,7 +46,9 @@ class _IncomingCallPageState extends ConsumerState<IncomingCallPage> {
   }
 
   Future<void> _decline(String userId) async {
-    await ref.read(callRepositoryProvider).decline(callId: widget.call.id, userId: userId);
+    await ref
+        .read(callRepositoryProvider)
+        .decline(callId: widget.call.id, userId: userId);
     if (mounted) context.pop();
   }
 
@@ -81,7 +85,9 @@ class _IncomingCallPageState extends ConsumerState<IncomingCallPage> {
                     icon: Icons.call,
                     color: theme.colorScheme.primary,
                     label: 'Accept',
-                    onPressed: (userId == null || _requesting) ? null : () => _accept(userId),
+                    onPressed: (userId == null || _requesting)
+                        ? null
+                        : () => _accept(userId),
                     loading: _requesting,
                   ),
                 ],
@@ -121,10 +127,13 @@ class _CallActionButton extends StatelessWidget {
             onPressed: onPressed,
             child: loading
                 ? const SizedBox(
-              height: 20,
-              width: 20,
-              child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
-            )
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: Colors.white,
+                    ),
+                  )
                 : Icon(icon, color: Colors.white),
           ),
         ),

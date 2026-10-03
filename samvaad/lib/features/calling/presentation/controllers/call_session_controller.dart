@@ -46,7 +46,11 @@ class CallSessionController extends _$CallSessionController {
     return const CallSessionIdle();
   }
 
-  Future<void> join({required String callId, required Call call, required String userId}) async {
+  Future<void> join({
+    required String callId,
+    required Call call,
+    required String userId,
+  }) async {
     state = const CallSessionConnecting();
 
     final tokenResult = await ref
@@ -60,11 +64,16 @@ class CallSessionController extends _$CallSessionController {
       return;
     }
 
-    final String token = tokenResult.fold(onSuccess: (t) => t, onFailure: (_) => '');
+    final String token = tokenResult.fold(
+      onSuccess: (t) => t,
+      onFailure: (_) => '',
+    );
 
     try {
       await _service.connect(url: liveKitUrl, token: token);
-      await ref.read(callRepositoryProvider).markJoined(callId: callId, userId: userId);
+      await ref
+          .read(callRepositoryProvider)
+          .markJoined(callId: callId, userId: userId);
       state = CallSessionConnected(_service.room);
     } catch (e) {
       state = CallSessionFailed(e.toString());
@@ -72,7 +81,8 @@ class CallSessionController extends _$CallSessionController {
   }
 
   Future<void> toggleCamera(bool enabled) => _service.setCameraEnabled(enabled);
-  Future<void> toggleMicrophone(bool enabled) => _service.setMicrophoneEnabled(enabled);
+  Future<void> toggleMicrophone(bool enabled) =>
+      _service.setMicrophoneEnabled(enabled);
 
   Future<void> leave(String callId) async {
     await _service.disconnect();

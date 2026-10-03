@@ -24,8 +24,9 @@ class ConversationListPage extends ConsumerWidget {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final AsyncValue<List<Conversation>> conversations =
-    ref.watch(conversationListProvider(userId));
+    final AsyncValue<List<Conversation>> conversations = ref.watch(
+      conversationListProvider(userId),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -53,7 +54,9 @@ class ConversationListPage extends ConsumerWidget {
         error: (error, stackTrace) => Center(
           child: Text(
             'Couldn\'t load conversations.',
-            style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.error),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.error,
+            ),
           ),
         ),
         data: (list) {
@@ -92,7 +95,10 @@ class ConversationListPage extends ConsumerWidget {
 }
 
 class _ConversationTile extends ConsumerWidget {
-  const _ConversationTile({required this.conversation, required this.currentUserId});
+  const _ConversationTile({
+    required this.conversation,
+    required this.currentUserId,
+  });
 
   final Conversation conversation;
   final String currentUserId;
@@ -129,7 +135,9 @@ class _ConversationTile extends ConsumerWidget {
   /// the common case, with a graceful (not silent) fallback remaining.
   String _resolveDirectTitle(WidgetRef ref, String? otherId) {
     if (otherId == null) return 'Unknown';
-    final AsyncValue<String?> nameAsync = ref.watch(displayNameProvider(otherId));
+    final AsyncValue<String?> nameAsync = ref.watch(
+      displayNameProvider(otherId),
+    );
     return nameAsync.value ?? otherId;
   }
 }

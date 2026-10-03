@@ -27,7 +27,8 @@ class OtpVerificationPage extends ConsumerStatefulWidget {
   final String phoneNumber;
 
   @override
-  ConsumerState<OtpVerificationPage> createState() => _OtpVerificationPageState();
+  ConsumerState<OtpVerificationPage> createState() =>
+      _OtpVerificationPageState();
 }
 
 class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
@@ -56,10 +57,12 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
 
   void _submit() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    ref.read(otpVerificationControllerProvider.notifier).submit(
-      verificationId: _verificationId,
-      otp: _otpController.text.trim(),
-    );
+    ref
+        .read(otpVerificationControllerProvider.notifier)
+        .submit(
+          verificationId: _verificationId,
+          otp: _otpController.text.trim(),
+        );
   }
 
   Future<void> _resend() async {
@@ -82,12 +85,19 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final OtpVerificationState state = ref.watch(otpVerificationControllerProvider);
+    final OtpVerificationState state = ref.watch(
+      otpVerificationControllerProvider,
+    );
     final int secondsRemaining = ref.watch(resendCooldownControllerProvider);
     final bool isSubmitting = state is OtpVerificationSubmitting;
-    final String? errorMessage = state is OtpVerificationFailed ? state.message : null;
+    final String? errorMessage = state is OtpVerificationFailed
+        ? state.message
+        : null;
 
-    ref.listen<OtpVerificationState>(otpVerificationControllerProvider, (previous, next) {
+    ref.listen<OtpVerificationState>(otpVerificationControllerProvider, (
+      previous,
+      next,
+    ) {
       if (next is OtpVerificationSucceeded) {
         // The router's redirect (Milestone 2.6) will take over from
         // here based on authStateChangesProvider now reporting a
@@ -156,10 +166,10 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
                   onPressed: isSubmitting ? null : _submit,
                   child: isSubmitting
                       ? const SizedBox(
-                    height: 22,
-                    width: 22,
-                    child: CircularProgressIndicator(strokeWidth: 2.5),
-                  )
+                          height: 22,
+                          width: 22,
+                          child: CircularProgressIndicator(strokeWidth: 2.5),
+                        )
                       : const Text('Verify'),
                 ),
                 const SizedBox(height: 16),

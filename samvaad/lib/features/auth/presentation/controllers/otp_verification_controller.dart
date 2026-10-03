@@ -61,10 +61,9 @@ class OtpVerificationController extends _$OtpVerificationController {
     // authenticated — but is worth knowing about if it ever happens
     // silently in production (see Future improvements).
     if (result case Success<AppUser>(data: final user)) {
-      await ref.read(userProfileRepositoryProvider).ensureUserDocument(
-        userId: user.id,
-        phoneNumber: user.phoneNumber,
-      );
+      await ref
+          .read(userProfileRepositoryProvider)
+          .ensureUserDocument(userId: user.id, phoneNumber: user.phoneNumber);
     }
 
     state = result.fold(

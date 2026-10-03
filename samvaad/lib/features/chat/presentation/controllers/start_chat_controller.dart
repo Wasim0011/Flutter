@@ -40,7 +40,9 @@ class StartChatController extends _$StartChatController {
   }) async {
     state = const StartChatSearching();
 
-    final lookup = await ref.read(userProfileRepositoryProvider).findUserIdByPhoneNumber(phoneNumber);
+    final lookup = await ref
+        .read(userProfileRepositoryProvider)
+        .findUserIdByPhoneNumber(phoneNumber);
 
     final String? otherUserId = lookup.fold(
       onSuccess: (id) => id,
@@ -48,7 +50,9 @@ class StartChatController extends _$StartChatController {
     );
 
     if (otherUserId == null) {
-      state = const StartChatFailed('No Samvaad user found with that phone number.');
+      state = const StartChatFailed(
+        'No Samvaad user found with that phone number.',
+      );
       return;
     }
     if (otherUserId == currentUserId) {
@@ -56,10 +60,12 @@ class StartChatController extends _$StartChatController {
       return;
     }
 
-    final result = await ref.read(chatRepositoryProvider).createOrGetDirectConversation(
-      currentUserId: currentUserId,
-      otherUserId: otherUserId,
-    );
+    final result = await ref
+        .read(chatRepositoryProvider)
+        .createOrGetDirectConversation(
+          currentUserId: currentUserId,
+          otherUserId: otherUserId,
+        );
 
     state = result.fold(
       onSuccess: (conversation) => StartChatReady(conversation),

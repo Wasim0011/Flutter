@@ -8,10 +8,7 @@
 /// This entity is honest about being a best-effort interpretation,
 /// not a certified translation.
 class SignInterpretation {
-  const SignInterpretation({
-    required this.text,
-    required this.confidence,
-  });
+  const SignInterpretation({required this.text, required this.confidence});
 
   final String text;
   final InterpretationConfidence confidence;
@@ -19,13 +16,16 @@ class SignInterpretation {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          (other is SignInterpretation && other.text == text && other.confidence == confidence);
+      (other is SignInterpretation &&
+          other.text == text &&
+          other.confidence == confidence);
 
   @override
   int get hashCode => Object.hash(text, confidence);
 
   @override
-  String toString() => 'SignInterpretation(text: $text, confidence: $confidence)';
+  String toString() =>
+      'SignInterpretation(text: $text, confidence: $confidence)';
 }
 
 enum InterpretationConfidence { low, medium, high }

@@ -12,9 +12,15 @@ abstract interface class CommunityRepository {
     required String description,
   });
 
-  Future<Result<void>> joinGroup({required String groupId, required String userId});
+  Future<Result<void>> joinGroup({
+    required String groupId,
+    required String userId,
+  });
 
-  Future<Result<void>> leaveGroup({required String groupId, required String userId});
+  Future<Result<void>> leaveGroup({
+    required String groupId,
+    required String userId,
+  });
 
   /// Live list of all users' public profiles — the directory. Returns
   /// [PublicProfile], never raw [AppUser]/phone data.

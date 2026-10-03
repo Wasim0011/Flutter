@@ -54,8 +54,13 @@ class CreateGroupController extends _$CreateGroupController {
 
     final List<String> resolvedIds = [];
     for (final phone in participantPhoneNumbers) {
-      final lookup = await ref.read(userProfileRepositoryProvider).findUserIdByPhoneNumber(phone);
-      final String? id = lookup.fold(onSuccess: (id) => id, onFailure: (_) => null);
+      final lookup = await ref
+          .read(userProfileRepositoryProvider)
+          .findUserIdByPhoneNumber(phone);
+      final String? id = lookup.fold(
+        onSuccess: (id) => id,
+        onFailure: (_) => null,
+      );
       if (id == null) {
         state = CreateGroupFailed('No Samvaad user found for $phone.');
         return;
@@ -63,11 +68,13 @@ class CreateGroupController extends _$CreateGroupController {
       resolvedIds.add(id);
     }
 
-    final result = await ref.read(chatRepositoryProvider).createGroupConversation(
-      currentUserId: currentUserId,
-      participantIds: resolvedIds,
-      title: title.trim(),
-    );
+    final result = await ref
+        .read(chatRepositoryProvider)
+        .createGroupConversation(
+          currentUserId: currentUserId,
+          participantIds: resolvedIds,
+          title: title.trim(),
+        );
 
     state = result.fold(
       onSuccess: (conversation) => CreateGroupReady(conversation),

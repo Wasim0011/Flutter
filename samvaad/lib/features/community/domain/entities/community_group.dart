@@ -28,13 +28,13 @@ class CommunityGroup {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          (other is CommunityGroup &&
-              other.id == id &&
-              other.name == name &&
-              other.description == description &&
-              other.createdBy == createdBy &&
-              _listEquals(other.memberIds, memberIds) &&
-              other.createdAt == createdAt);
+      (other is CommunityGroup &&
+          other.id == id &&
+          other.name == name &&
+          other.description == description &&
+          other.createdBy == createdBy &&
+          _listEquals(other.memberIds, memberIds) &&
+          other.createdAt == createdAt);
 
   @override
   int get hashCode => Object.hash(
@@ -47,7 +47,8 @@ class CommunityGroup {
   );
 
   @override
-  String toString() => 'CommunityGroup(id: $id, name: $name, memberCount: $memberCount)';
+  String toString() =>
+      'CommunityGroup(id: $id, name: $name, memberCount: $memberCount)';
 }
 
 bool _listEquals(List<String> a, List<String> b) {

@@ -13,9 +13,7 @@ void main() {
   setUp(() {
     fakeRepo = FakeUserProfileRepository();
     container = ProviderContainer(
-      overrides: [
-        userProfileRepositoryProvider.overrideWithValue(fakeRepo),
-      ],
+      overrides: [userProfileRepositoryProvider.overrideWithValue(fakeRepo)],
     );
   });
 
@@ -26,44 +24,62 @@ void main() {
   });
 
   test('submit() saves both name and preference, reaching complete', () async {
-    await container.read(onboardingControllerProvider.notifier).submit(
-      userId: userId,
-      displayName: 'Wasim',
-      preference: CommunicationPreference.textFirst,
-    );
+    await container
+        .read(onboardingControllerProvider.notifier)
+        .submit(
+          userId: userId,
+          displayName: 'Wasim',
+          preference: CommunicationPreference.textFirst,
+        );
 
-    expect(container.read(onboardingControllerProvider), isA<OnboardingComplete>());
+    expect(
+      container.read(onboardingControllerProvider),
+      isA<OnboardingComplete>(),
+    );
 
     final name = await fakeRepo.getDisplayName(userId);
     final pref = await fakeRepo.getCommunicationPreference(userId);
     expect(name.fold(onSuccess: (n) => n, onFailure: (_) => null), 'Wasim');
-    expect(pref.fold(onSuccess: (p) => p, onFailure: (_) => null),
-        CommunicationPreference.textFirst);
-  });
-
-  test('hasCompletedOnboardingProvider is false before submit, true after', () async {
-    final before = await container.read(hasCompletedOnboardingProvider(userId).future);
-    expect(before, isFalse);
-
-    await container.read(onboardingControllerProvider.notifier).submit(
-      userId: userId,
-      displayName: 'Wasim',
-      preference: CommunicationPreference.noPreference,
+    expect(
+      pref.fold(onSuccess: (p) => p, onFailure: (_) => null),
+      CommunicationPreference.textFirst,
     );
-
-    // hasCompletedOnboardingProvider is a separate FutureProvider
-    // instance keyed by userId; re-reading it fetches fresh since
-    // it's autoDispose and this is a new read, not a cached one.
-    final after = await container.read(hasCompletedOnboardingProvider(userId).future);
-    expect(after, isTrue);
   });
+
+  test(
+    'hasCompletedOnboardingProvider is false before submit, true after',
+    () async {
+      final before = await container.read(
+        hasCompletedOnboardingProvider(userId).future,
+      );
+      expect(before, isFalse);
+
+      await container
+          .read(onboardingControllerProvider.notifier)
+          .submit(
+            userId: userId,
+            displayName: 'Wasim',
+            preference: CommunicationPreference.noPreference,
+          );
+
+      // hasCompletedOnboardingProvider is a separate FutureProvider
+      // instance keyed by userId; re-reading it fetches fresh since
+      // it's autoDispose and this is a new read, not a cached one.
+      final after = await container.read(
+        hasCompletedOnboardingProvider(userId).future,
+      );
+      expect(after, isTrue);
+    },
+  );
 
   test('displayNameProvider reflects the saved name', () async {
-    await container.read(onboardingControllerProvider.notifier).submit(
-      userId: userId,
-      displayName: 'Wasim',
-      preference: CommunicationPreference.captionsFirst,
-    );
+    await container
+        .read(onboardingControllerProvider.notifier)
+        .submit(
+          userId: userId,
+          displayName: 'Wasim',
+          preference: CommunicationPreference.captionsFirst,
+        );
 
     final name = await container.read(displayNameProvider(userId).future);
     expect(name, 'Wasim');

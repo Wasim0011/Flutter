@@ -33,21 +33,23 @@ abstract final class AppTheme {
         foregroundColor: scheme.onSurface,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: AppTypography
-            .textTheme(scheme.brightness)
-            .titleLarge,
+        titleTextStyle: AppTypography.textTheme(scheme.brightness).titleLarge,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           minimumSize: const Size.fromHeight(52), // generous tap target
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
           textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           minimumSize: const Size.fromHeight(52),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
           side: BorderSide(color: scheme.outline),
         ),
       ),
@@ -58,7 +60,10 @@ abstract final class AppTheme {
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
       ),
       cardTheme: CardThemeData(
         elevation: 0,

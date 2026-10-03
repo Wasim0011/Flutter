@@ -8,12 +8,14 @@ import '../../domain/repositories/community_repository.dart';
 
 class FirestoreCommunityRepository implements CommunityRepository {
   FirestoreCommunityRepository({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
 
-  CollectionReference<Map<String, dynamic>> get _groups => _firestore.collection('groups');
-  CollectionReference<Map<String, dynamic>> get _users => _firestore.collection('users');
+  CollectionReference<Map<String, dynamic>> get _groups =>
+      _firestore.collection('groups');
+  CollectionReference<Map<String, dynamic>> get _users =>
+      _firestore.collection('users');
 
   @override
   Stream<List<CommunityGroup>> watchGroups() {
@@ -39,21 +41,26 @@ class FirestoreCommunityRepository implements CommunityRepository {
         'createdAt': Timestamp.fromDate(now),
       });
 
-      return Result.success(CommunityGroup(
-        id: docRef.id,
-        name: name,
-        description: description,
-        createdBy: createdBy,
-        memberIds: [createdBy],
-        createdAt: now,
-      ));
+      return Result.success(
+        CommunityGroup(
+          id: docRef.id,
+          name: name,
+          description: description,
+          createdBy: createdBy,
+          memberIds: [createdBy],
+          createdAt: now,
+        ),
+      );
     } catch (e) {
       return Result.failure(Failure.unexpected(e.toString()));
     }
   }
 
   @override
-  Future<Result<void>> joinGroup({required String groupId, required String userId}) async {
+  Future<Result<void>> joinGroup({
+    required String groupId,
+    required String userId,
+  }) async {
     try {
       await _groups.doc(groupId).update({
         'memberIds': FieldValue.arrayUnion([userId]),
@@ -65,7 +72,10 @@ class FirestoreCommunityRepository implements CommunityRepository {
   }
 
   @override
-  Future<Result<void>> leaveGroup({required String groupId, required String userId}) async {
+  Future<Result<void>> leaveGroup({
+    required String groupId,
+    required String userId,
+  }) async {
     try {
       await _groups.doc(groupId).update({
         'memberIds': FieldValue.arrayRemove([userId]),
@@ -79,8 +89,11 @@ class FirestoreCommunityRepository implements CommunityRepository {
   @override
   Stream<List<PublicProfile>> watchDirectory() {
     return _users.snapshots().map(
-          (snapshot) => snapshot.docs
-          .where((doc) => (doc.data()['displayName'] as String?)?.isNotEmpty ?? false)
+      (snapshot) => snapshot.docs
+          .where(
+            (doc) =>
+                (doc.data()['displayName'] as String?)?.isNotEmpty ?? false,
+          )
           .map(_profileFromDoc)
           .toList(),
     );
@@ -99,7 +112,9 @@ class FirestoreCommunityRepository implements CommunityRepository {
     }
   }
 
-  CommunityGroup _groupFromDoc(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
+  CommunityGroup _groupFromDoc(
+    QueryDocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
     final data = doc.data();
     return CommunityGroup(
       id: doc.id,

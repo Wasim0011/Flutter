@@ -5,8 +5,20 @@ void main() {
   group('Message', () {
     test('two instances with identical fields are equal', () {
       final DateTime now = DateTime(2026, 1, 1);
-      final a = Message(id: 'm1', conversationId: 'c1', senderId: 'u1', text: 'hi', sentAt: now);
-      final b = Message(id: 'm1', conversationId: 'c1', senderId: 'u1', text: 'hi', sentAt: now);
+      final a = Message(
+        id: 'm1',
+        conversationId: 'c1',
+        senderId: 'u1',
+        text: 'hi',
+        sentAt: now,
+      );
+      final b = Message(
+        id: 'm1',
+        conversationId: 'c1',
+        senderId: 'u1',
+        text: 'hi',
+        sentAt: now,
+      );
 
       expect(a, equals(b));
       expect(a.hashCode, equals(b.hashCode));

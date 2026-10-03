@@ -25,17 +25,20 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     super.dispose();
   }
 
-  bool get _canSubmit => _nameController.text.trim().isNotEmpty && _selected != null;
+  bool get _canSubmit =>
+      _nameController.text.trim().isNotEmpty && _selected != null;
 
   void _submit() {
     final CommunicationPreference? preference = _selected;
     final String name = _nameController.text.trim();
     if (preference == null || name.isEmpty) return;
-    ref.read(onboardingControllerProvider.notifier).submit(
-      userId: widget.userId,
-      displayName: name,
-      preference: preference,
-    );
+    ref
+        .read(onboardingControllerProvider.notifier)
+        .submit(
+          userId: widget.userId,
+          displayName: name,
+          preference: preference,
+        );
   }
 
   @override
@@ -77,7 +80,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
               const SizedBox(height: 8),
               Text(
                 'This helps Samvaad show you the right tools by default — '
-                    'you can change it anytime in settings.',
+                'you can change it anytime in settings.',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -92,13 +95,15 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                       value: CommunicationPreference.captionsFirst,
                       title: 'Captions first',
                       subtitle: 'I prefer live captions for speech and video',
-                      selected: _selected == CommunicationPreference.captionsFirst,
+                      selected:
+                          _selected == CommunicationPreference.captionsFirst,
                     ),
                     _PreferenceTile(
                       value: CommunicationPreference.signLanguage,
                       title: 'Sign language',
                       subtitle: 'I use or prefer sign language',
-                      selected: _selected == CommunicationPreference.signLanguage,
+                      selected:
+                          _selected == CommunicationPreference.signLanguage,
                     ),
                     _PreferenceTile(
                       value: CommunicationPreference.textFirst,
@@ -110,7 +115,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                       value: CommunicationPreference.noPreference,
                       title: 'No preference',
                       subtitle: 'Show me everything, I\'ll decide as I go',
-                      selected: _selected == CommunicationPreference.noPreference,
+                      selected:
+                          _selected == CommunicationPreference.noPreference,
                     ),
                   ],
                 ),
@@ -123,7 +129,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                     padding: const EdgeInsets.only(bottom: 16),
                     child: Text(
                       state.message,
-                      style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.error),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.error,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -136,10 +144,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                   onPressed: (!_canSubmit || isSubmitting) ? null : _submit,
                   child: isSubmitting
                       ? const SizedBox(
-                    height: 22,
-                    width: 22,
-                    child: CircularProgressIndicator(strokeWidth: 2.5),
-                  )
+                          height: 22,
+                          width: 22,
+                          child: CircularProgressIndicator(strokeWidth: 2.5),
+                        )
                       : const Text('Continue'),
                 ),
               ),

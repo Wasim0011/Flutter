@@ -13,9 +13,7 @@ void main() {
   setUp(() {
     fakeRepo = FakeAuthRepository();
     container = ProviderContainer(
-      overrides: [
-        authRepositoryProvider.overrideWithValue(fakeRepo),
-      ],
+      overrides: [authRepositoryProvider.overrideWithValue(fakeRepo)],
     );
   });
 
@@ -26,13 +24,19 @@ void main() {
 
   test('initial location is the splash route', () {
     final GoRouter router = container.read(appRouterProvider);
-    expect(router.routeInformationProvider.value.uri.toString(), AppRoutes.splash);
+    expect(
+      router.routeInformationProvider.value.uri.toString(),
+      AppRoutes.splash,
+    );
   });
 
   test('phoneEntry and otpVerification routes are registered by name', () {
     final GoRouter router = container.read(appRouterProvider);
 
-    expect(router.namedLocation(AppRoutes.phoneEntryName), AppRoutes.phoneEntry);
+    expect(
+      router.namedLocation(AppRoutes.phoneEntryName),
+      AppRoutes.phoneEntry,
+    );
     // otpVerification requires `extra`, so namedLocation() alone (path
     // resolution) is what we can verify without triggering the
     // builder — full navigation behavior is covered by the redirect

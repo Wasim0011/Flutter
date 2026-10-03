@@ -20,21 +20,24 @@ class PublicProfile {
     final List<String> parts = displayName.trim().split(RegExp(r'\s+'));
     if (parts.isEmpty || parts.first.isEmpty) return '?';
     final String first = parts.first[0];
-    final String second = parts.length > 1 && parts[1].isNotEmpty ? parts[1][0] : '';
+    final String second = parts.length > 1 && parts[1].isNotEmpty
+        ? parts[1][0]
+        : '';
     return (first + second).toUpperCase();
   }
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          (other is PublicProfile &&
-              other.userId == userId &&
-              other.displayName == displayName &&
-              other.bio == bio);
+      (other is PublicProfile &&
+          other.userId == userId &&
+          other.displayName == displayName &&
+          other.bio == bio);
 
   @override
   int get hashCode => Object.hash(userId, displayName, bio);
 
   @override
-  String toString() => 'PublicProfile(userId: $userId, displayName: $displayName)';
+  String toString() =>
+      'PublicProfile(userId: $userId, displayName: $displayName)';
 }

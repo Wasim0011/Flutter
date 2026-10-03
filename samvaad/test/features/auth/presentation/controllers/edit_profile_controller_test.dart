@@ -20,27 +20,32 @@ void main() {
   tearDown(() => container.dispose());
 
   test('fails with an empty display name', () async {
-    await container.read(editProfileControllerProvider.notifier).submit(
-      userId: userId,
-      displayName: '  ',
-      bio: 'hello',
-    );
+    await container
+        .read(editProfileControllerProvider.notifier)
+        .submit(userId: userId, displayName: '  ', bio: 'hello');
 
-    expect(container.read(editProfileControllerProvider), isA<EditProfileFailed>());
+    expect(
+      container.read(editProfileControllerProvider),
+      isA<EditProfileFailed>(),
+    );
   });
 
   test('succeeds and saves both name and bio', () async {
-    await container.read(editProfileControllerProvider.notifier).submit(
-      userId: userId,
-      displayName: 'Wasim',
-      bio: 'Flutter developer',
-    );
+    await container
+        .read(editProfileControllerProvider.notifier)
+        .submit(userId: userId, displayName: 'Wasim', bio: 'Flutter developer');
 
-    expect(container.read(editProfileControllerProvider), isA<EditProfileSuccess>());
+    expect(
+      container.read(editProfileControllerProvider),
+      isA<EditProfileSuccess>(),
+    );
 
     final name = await fakeRepo.getDisplayName(userId);
     final bio = await fakeRepo.getBio(userId);
     expect(name.fold(onSuccess: (n) => n, onFailure: (_) => null), 'Wasim');
-    expect(bio.fold(onSuccess: (b) => b, onFailure: (_) => null), 'Flutter developer');
+    expect(
+      bio.fold(onSuccess: (b) => b, onFailure: (_) => null),
+      'Flutter developer',
+    );
   });
 }

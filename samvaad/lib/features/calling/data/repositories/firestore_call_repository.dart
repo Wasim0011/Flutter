@@ -7,14 +7,17 @@ import '../../domain/entities/call.dart';
 import '../../domain/repositories/call_repository.dart';
 
 class FirestoreCallRepository implements CallRepository {
-  FirestoreCallRepository({FirebaseFirestore? firestore, FirebaseFunctions? functions})
-      : _firestore = firestore ?? FirebaseFirestore.instance,
-        _functions = functions ?? FirebaseFunctions.instance;
+  FirestoreCallRepository({
+    FirebaseFirestore? firestore,
+    FirebaseFunctions? functions,
+  }) : _firestore = firestore ?? FirebaseFirestore.instance,
+       _functions = functions ?? FirebaseFunctions.instance;
 
   final FirebaseFirestore _firestore;
   final FirebaseFunctions _functions;
 
-  CollectionReference<Map<String, dynamic>> get _calls => _firestore.collection('calls');
+  CollectionReference<Map<String, dynamic>> get _calls =>
+      _firestore.collection('calls');
 
   @override
   Future<Result<Call>> startCall({
@@ -37,24 +40,31 @@ class FirestoreCallRepository implements CallRepository {
         'conversationId': conversationId,
       });
 
-      return Result.success(Call(
-        id: docRef.id,
-        roomName: roomName,
-        callerId: callerId,
-        participantIds: participantIds,
-        status: CallStatus.ringing,
-        createdAt: now,
-        conversationId: conversationId,
-      ));
+      return Result.success(
+        Call(
+          id: docRef.id,
+          roomName: roomName,
+          callerId: callerId,
+          participantIds: participantIds,
+          status: CallStatus.ringing,
+          createdAt: now,
+          conversationId: conversationId,
+        ),
+      );
     } catch (e) {
       return Result.failure(Failure.unexpected(e.toString()));
     }
   }
 
   @override
-  Future<Result<void>> markJoined({required String callId, required String userId}) async {
+  Future<Result<void>> markJoined({
+    required String callId,
+    required String userId,
+  }) async {
     try {
-      await _calls.doc(callId).set({'status': CallStatus.active.name}, SetOptions(merge: true));
+      await _calls.doc(callId).set({
+        'status': CallStatus.active.name,
+      }, SetOptions(merge: true));
       return const Result.success(null);
     } catch (e) {
       return Result.failure(Failure.unexpected(e.toString()));
@@ -62,9 +72,14 @@ class FirestoreCallRepository implements CallRepository {
   }
 
   @override
-  Future<Result<void>> decline({required String callId, required String userId}) async {
+  Future<Result<void>> decline({
+    required String callId,
+    required String userId,
+  }) async {
     try {
-      await _calls.doc(callId).set({'status': CallStatus.declined.name}, SetOptions(merge: true));
+      await _calls.doc(callId).set({
+        'status': CallStatus.declined.name,
+      }, SetOptions(merge: true));
       return const Result.success(null);
     } catch (e) {
       return Result.failure(Failure.unexpected(e.toString()));
@@ -74,7 +89,9 @@ class FirestoreCallRepository implements CallRepository {
   @override
   Future<Result<void>> endCall(String callId) async {
     try {
-      await _calls.doc(callId).set({'status': CallStatus.ended.name}, SetOptions(merge: true));
+      await _calls.doc(callId).set({
+        'status': CallStatus.ended.name,
+      }, SetOptions(merge: true));
       return const Result.success(null);
     } catch (e) {
       return Result.failure(Failure.unexpected(e.toString()));
@@ -85,7 +102,10 @@ class FirestoreCallRepository implements CallRepository {
   Stream<List<Call>> watchIncomingAndActiveCalls(String userId) {
     return _calls
         .where('participantIds', arrayContains: userId)
-        .where('status', whereIn: [CallStatus.ringing.name, CallStatus.active.name])
+        .where(
+          'status',
+          whereIn: [CallStatus.ringing.name, CallStatus.active.name],
+        )
         .snapshots()
         .map((snapshot) => snapshot.docs.map(_callFromDoc).toList());
   }
@@ -96,8 +116,12 @@ class FirestoreCallRepository implements CallRepository {
     required String userId,
   }) async {
     try {
-      final HttpsCallable callable = _functions.httpsCallable('generateLiveKitToken');
-      final result = await callable.call<Map<String, dynamic>>({'roomName': roomName});
+      final HttpsCallable callable = _functions.httpsCallable(
+        'generateLiveKitToken',
+      );
+      final result = await callable.call<Map<String, dynamic>>({
+        'roomName': roomName,
+      });
       final String? token = result.data['token'] as String?;
       if (token == null) {
         return const Result.failure(Failure.unexpected('No token returned.'));

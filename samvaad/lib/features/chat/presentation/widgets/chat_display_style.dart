@@ -47,12 +47,12 @@ class ChatDisplayStyle {
           showTimestamps: false,
         );
       case CommunicationPreference.signLanguage:
-      // Sign language support in calling/video isn't built yet
-      // (deferred per Phase 0's product decision) — for the text
-      // chat surface specifically, this preference currently
-      // behaves like noPreference. Kept as its own case rather than
-      // falling through to `default`, so a future video-chat
-      // feature has an obvious place to give it real behavior.
+        // Sign language support in calling/video isn't built yet
+        // (deferred per Phase 0's product decision) — for the text
+        // chat surface specifically, this preference currently
+        // behaves like noPreference. Kept as its own case rather than
+        // falling through to `default`, so a future video-chat
+        // feature has an obvious place to give it real behavior.
         return const ChatDisplayStyle(
           fontScale: 1.0,
           announceIncomingMessages: false,

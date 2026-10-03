@@ -44,14 +44,14 @@ class Call {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          (other is Call &&
-              other.id == id &&
-              other.roomName == roomName &&
-              other.callerId == callerId &&
-              _listEquals(other.participantIds, participantIds) &&
-              other.status == status &&
-              other.createdAt == createdAt &&
-              other.conversationId == conversationId);
+      (other is Call &&
+          other.id == id &&
+          other.roomName == roomName &&
+          other.callerId == callerId &&
+          _listEquals(other.participantIds, participantIds) &&
+          other.status == status &&
+          other.createdAt == createdAt &&
+          other.conversationId == conversationId);
 
   @override
   int get hashCode => Object.hash(
@@ -65,7 +65,8 @@ class Call {
   );
 
   @override
-  String toString() => 'Call(id: $id, status: $status, participantIds: $participantIds)';
+  String toString() =>
+      'Call(id: $id, status: $status, participantIds: $participantIds)';
 }
 
 enum CallStatus {

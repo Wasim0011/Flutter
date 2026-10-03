@@ -10,9 +10,11 @@ class FakeCommunityRepository implements CommunityRepository {
   final Map<String, CommunityGroup> _groups = {};
   final Map<String, PublicProfile> _profiles = {};
   int _idCounter = 0;
-  final StreamController<List<CommunityGroup>> _groupsController = StreamController.broadcast();
+  final StreamController<List<CommunityGroup>> _groupsController =
+      StreamController.broadcast();
 
-  void seedProfile(PublicProfile profile) => _profiles[profile.userId] = profile;
+  void seedProfile(PublicProfile profile) =>
+      _profiles[profile.userId] = profile;
 
   void _emitGroups() => _groupsController.add(_groups.values.toList());
 
@@ -46,9 +48,14 @@ class FakeCommunityRepository implements CommunityRepository {
   }
 
   @override
-  Future<Result<void>> joinGroup({required String groupId, required String userId}) async {
+  Future<Result<void>> joinGroup({
+    required String groupId,
+    required String userId,
+  }) async {
     final existing = _groups[groupId];
-    if (existing == null) return const Result.failure(Failure.unexpected('Group not found.'));
+    if (existing == null) {
+      return const Result.failure(Failure.unexpected('Group not found.'));
+    }
     if (!existing.memberIds.contains(userId)) {
       _groups[groupId] = CommunityGroup(
         id: existing.id,
@@ -64,9 +71,14 @@ class FakeCommunityRepository implements CommunityRepository {
   }
 
   @override
-  Future<Result<void>> leaveGroup({required String groupId, required String userId}) async {
+  Future<Result<void>> leaveGroup({
+    required String groupId,
+    required String userId,
+  }) async {
     final existing = _groups[groupId];
-    if (existing == null) return const Result.failure(Failure.unexpected('Group not found.'));
+    if (existing == null) {
+      return const Result.failure(Failure.unexpected('Group not found.'));
+    }
     _groups[groupId] = CommunityGroup(
       id: existing.id,
       name: existing.name,

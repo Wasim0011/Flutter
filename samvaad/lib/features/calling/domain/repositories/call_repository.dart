@@ -21,10 +21,16 @@ abstract interface class CallRepository {
 
   /// Marks [callId] as [CallStatus.active] once [userId] joins the
   /// actual LiveKit room.
-  Future<Result<void>> markJoined({required String callId, required String userId});
+  Future<Result<void>> markJoined({
+    required String callId,
+    required String userId,
+  });
 
   /// Marks [callId] as [CallStatus.declined] by [userId].
-  Future<Result<void>> decline({required String callId, required String userId});
+  Future<Result<void>> decline({
+    required String callId,
+    required String userId,
+  });
 
   /// Ends [callId] entirely (any participant can end a call for
   /// everyone — consistent with how most calling apps behave).

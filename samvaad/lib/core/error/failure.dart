@@ -38,9 +38,9 @@ sealed class Failure {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          (other.runtimeType == runtimeType &&
-              other is Failure &&
-              other.message == message);
+      (other.runtimeType == runtimeType &&
+          other is Failure &&
+          other.message == message);
 
   @override
   int get hashCode => Object.hash(runtimeType, message);

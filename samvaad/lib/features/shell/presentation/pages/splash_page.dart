@@ -49,7 +49,9 @@ class SplashPage extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      user != null ? 'Signed in as ${user.phoneNumber}' : 'Foundation build',
+                      user != null
+                          ? 'Signed in as ${user.phoneNumber}'
+                          : 'Foundation build',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),

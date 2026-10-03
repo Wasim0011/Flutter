@@ -21,7 +21,7 @@ import '../../domain/repositories/chat_repository.dart';
 /// both correct and cheap.
 class FirestoreChatRepository implements ChatRepository {
   FirestoreChatRepository({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
 
@@ -59,7 +59,10 @@ class FirestoreChatRepository implements ChatRepository {
   }) async {
     try {
       final String key = _directKeyFor(currentUserId, otherUserId);
-      final existing = await _conversations.where('directKey', isEqualTo: key).limit(1).get();
+      final existing = await _conversations
+          .where('directKey', isEqualTo: key)
+          .limit(1)
+          .get();
 
       if (existing.docs.isNotEmpty) {
         return Result.success(_conversationFromDoc(existing.docs.first));
@@ -75,12 +78,14 @@ class FirestoreChatRepository implements ChatRepository {
         'lastMessageAt': Timestamp.fromDate(now),
       });
 
-      return Result.success(Conversation(
-        id: docRef.id,
-        type: ConversationType.direct,
-        participantIds: [currentUserId, otherUserId],
-        createdAt: now,
-      ));
+      return Result.success(
+        Conversation(
+          id: docRef.id,
+          type: ConversationType.direct,
+          participantIds: [currentUserId, otherUserId],
+          createdAt: now,
+        ),
+      );
     } catch (e) {
       return Result.failure(Failure.unexpected(e.toString()));
     }
@@ -105,13 +110,15 @@ class FirestoreChatRepository implements ChatRepository {
         'lastMessageAt': Timestamp.fromDate(now),
       });
 
-      return Result.success(Conversation(
-        id: docRef.id,
-        type: ConversationType.group,
-        participantIds: allParticipants.toList(),
-        createdAt: now,
-        title: title,
-      ));
+      return Result.success(
+        Conversation(
+          id: docRef.id,
+          type: ConversationType.group,
+          participantIds: allParticipants.toList(),
+          createdAt: now,
+          title: title,
+        ),
+      );
     } catch (e) {
       return Result.failure(Failure.unexpected(e.toString()));
     }
@@ -140,13 +147,10 @@ class FirestoreChatRepository implements ChatRepository {
         'type': MessageType.text.name,
       });
 
-      await conversationRef.set(
-        {
-          'lastMessagePreview': text,
-          'lastMessageAt': Timestamp.fromDate(now),
-        },
-        SetOptions(merge: true),
-      );
+      await conversationRef.set({
+        'lastMessagePreview': text,
+        'lastMessageAt': Timestamp.fromDate(now),
+      }, SetOptions(merge: true));
 
       return const Result.success(null);
     } catch (e) {
@@ -154,7 +158,9 @@ class FirestoreChatRepository implements ChatRepository {
     }
   }
 
-  Conversation _conversationFromDoc(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
+  Conversation _conversationFromDoc(
+    QueryDocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
     final data = doc.data();
     return Conversation(
       id: doc.id,

@@ -15,9 +15,7 @@ void main() {
   setUp(() {
     fakeChatRepo = FakeChatRepository();
     container = ProviderContainer(
-      overrides: [
-        chatRepositoryProvider.overrideWithValue(fakeChatRepo),
-      ],
+      overrides: [chatRepositoryProvider.overrideWithValue(fakeChatRepo)],
     );
   });
 
@@ -35,7 +33,7 @@ void main() {
       // keeping the provider alive for the duration of this test.
       final sub = container.listen(
         messageThreadProvider(conversationId),
-            (previous, next) {},
+        (previous, next) {},
       );
       addTearDown(sub.close);
 
@@ -49,7 +47,7 @@ void main() {
     test('emits messages after one is sent', () async {
       final sub = container.listen(
         messageThreadProvider(conversationId),
-            (previous, next) {},
+        (previous, next) {},
       );
       addTearDown(sub.close);
 
@@ -72,37 +70,50 @@ void main() {
 
   group('SendMessageController', () {
     test('starts in idle state', () {
-      expect(container.read(sendMessageControllerProvider), isA<SendMessageIdle>());
+      expect(
+        container.read(sendMessageControllerProvider),
+        isA<SendMessageIdle>(),
+      );
     });
 
     test('send() returns to idle on success', () async {
-      await container.read(sendMessageControllerProvider.notifier).send(
-        conversationId: conversationId,
-        senderId: senderId,
-        text: 'hi there',
-      );
+      await container
+          .read(sendMessageControllerProvider.notifier)
+          .send(
+            conversationId: conversationId,
+            senderId: senderId,
+            text: 'hi there',
+          );
 
-      expect(container.read(sendMessageControllerProvider), isA<SendMessageIdle>());
+      expect(
+        container.read(sendMessageControllerProvider),
+        isA<SendMessageIdle>(),
+      );
     });
 
     test('send() does nothing for blank text', () async {
       final sub = container.listen(
         messageThreadProvider(conversationId),
-            (previous, next) {},
+        (previous, next) {},
       );
       addTearDown(sub.close);
 
-      await container.read(sendMessageControllerProvider.notifier).send(
-        conversationId: conversationId,
-        senderId: senderId,
-        text: '   ',
-      );
+      await container
+          .read(sendMessageControllerProvider.notifier)
+          .send(
+            conversationId: conversationId,
+            senderId: senderId,
+            text: '   ',
+          );
 
       final List<Message> messages = await container.read(
         messageThreadProvider(conversationId).future,
       );
       expect(messages, isEmpty);
-      expect(container.read(sendMessageControllerProvider), isA<SendMessageIdle>());
+      expect(
+        container.read(sendMessageControllerProvider),
+        isA<SendMessageIdle>(),
+      );
     });
   });
 }

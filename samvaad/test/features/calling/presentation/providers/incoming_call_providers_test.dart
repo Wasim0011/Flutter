@@ -31,33 +31,48 @@ void main() {
     // it can emit. container.listen() establishes a real subscriber,
     // keeping the provider alive for the duration of this test (same
     // fix as Phase 3's message_thread_controller_test.dart).
-    final sub = container.listen(nextIncomingCallProvider(userId), (previous, next) {});
+    final sub = container.listen(
+      nextIncomingCallProvider(userId),
+      (previous, next) {},
+    );
     addTearDown(sub.close);
 
-    final Call? result = await container.read(nextIncomingCallProvider(userId).future);
+    final Call? result = await container.read(
+      nextIncomingCallProvider(userId).future,
+    );
     expect(result, isNull);
   });
 
   test('emits the call when someone else calls this user', () async {
-    final sub = container.listen(nextIncomingCallProvider(userId), (previous, next) {});
+    final sub = container.listen(
+      nextIncomingCallProvider(userId),
+      (previous, next) {},
+    );
     addTearDown(sub.close);
 
     await fakeRepo.startCall(callerId: callerId, calleeIds: [userId]);
     await Future<void>.delayed(Duration.zero);
 
-    final AsyncValue<Call?> state = container.read(nextIncomingCallProvider(userId));
+    final AsyncValue<Call?> state = container.read(
+      nextIncomingCallProvider(userId),
+    );
     expect(state.value, isNotNull);
     expect(state.value!.callerId, callerId);
   });
 
   test('does not surface a call the user started themselves', () async {
-    final sub = container.listen(nextIncomingCallProvider(userId), (previous, next) {});
+    final sub = container.listen(
+      nextIncomingCallProvider(userId),
+      (previous, next) {},
+    );
     addTearDown(sub.close);
 
     await fakeRepo.startCall(callerId: userId, calleeIds: [callerId]);
     await Future<void>.delayed(Duration.zero);
 
-    final AsyncValue<Call?> state = container.read(nextIncomingCallProvider(userId));
+    final AsyncValue<Call?> state = container.read(
+      nextIncomingCallProvider(userId),
+    );
     expect(state.value, isNull);
   });
 }

@@ -51,7 +51,7 @@ final class ResultFailure<T> extends Result<T> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          (other is ResultFailure<T> && other.failure == failure);
+      (other is ResultFailure<T> && other.failure == failure);
 
   @override
   int get hashCode => Object.hash(runtimeType, failure);

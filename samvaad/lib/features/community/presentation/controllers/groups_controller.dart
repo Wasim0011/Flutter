@@ -49,11 +49,13 @@ class CreateCommunityGroupController extends _$CreateCommunityGroupController {
 
     state = const CreateCommunityGroupSubmitting();
 
-    final result = await ref.read(communityRepositoryProvider).createGroup(
-      createdBy: createdBy,
-      name: name.trim(),
-      description: description.trim(),
-    );
+    final result = await ref
+        .read(communityRepositoryProvider)
+        .createGroup(
+          createdBy: createdBy,
+          name: name.trim(),
+          description: description.trim(),
+        );
 
     state = result.fold(
       onSuccess: (group) => CreateCommunityGroupReady(group),

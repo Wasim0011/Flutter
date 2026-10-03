@@ -30,8 +30,9 @@ void main() {
     });
 
     test('fold() invokes the onFailure branch for ResultFailure', () {
-      const Result<String> result =
-      Result.failure(Failure.validation('empty field'));
+      const Result<String> result = Result.failure(
+        Failure.validation('empty field'),
+      );
 
       final String output = result.fold(
         onSuccess: (data) => 'got $data',

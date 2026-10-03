@@ -23,25 +23,31 @@ void main() {
   });
 
   test('starts in idle state', () {
-    expect(container.read(createCommunityGroupControllerProvider), isA<CreateCommunityGroupIdle>());
+    expect(
+      container.read(createCommunityGroupControllerProvider),
+      isA<CreateCommunityGroupIdle>(),
+    );
   });
 
   test('fails with an empty name', () async {
-    await container.read(createCommunityGroupControllerProvider.notifier).create(
-      createdBy: userId,
-      name: '   ',
-      description: 'desc',
-    );
+    await container
+        .read(createCommunityGroupControllerProvider.notifier)
+        .create(createdBy: userId, name: '   ', description: 'desc');
 
-    expect(container.read(createCommunityGroupControllerProvider), isA<CreateCommunityGroupFailed>());
+    expect(
+      container.read(createCommunityGroupControllerProvider),
+      isA<CreateCommunityGroupFailed>(),
+    );
   });
 
   test('succeeds and includes the creator as the first member', () async {
-    await container.read(createCommunityGroupControllerProvider.notifier).create(
-      createdBy: userId,
-      name: 'Book Club',
-      description: 'We read books',
-    );
+    await container
+        .read(createCommunityGroupControllerProvider.notifier)
+        .create(
+          createdBy: userId,
+          name: 'Book Club',
+          description: 'We read books',
+        );
 
     final state = container.read(createCommunityGroupControllerProvider);
     expect(state, isA<CreateCommunityGroupReady>());

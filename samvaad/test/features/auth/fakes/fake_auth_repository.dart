@@ -41,7 +41,9 @@ class FakeAuthRepository implements AuthRepository {
       return Result.failure(verifyOtpFailure!);
     }
     if (otp != correctOtp) {
-      return const Result.failure(Failure.validation('That code is incorrect.'));
+      return const Result.failure(
+        Failure.validation('That code is incorrect.'),
+      );
     }
 
     const AppUser user = AppUser(id: 'fake-uid', phoneNumber: '+919999999999');
@@ -74,14 +76,18 @@ class FakeAuthRepository implements AuthRepository {
 
   void _emit(AppUser? user) {
     _currentUser = user;
-    for (final controller in List<MultiStreamController<AppUser?>>.of(_controllers)) {
+    for (final controller in List<MultiStreamController<AppUser?>>.of(
+      _controllers,
+    )) {
       controller.add(user);
     }
   }
 
   /// Call in `tearDown` to release all active listeners between tests.
   void dispose() {
-    for (final controller in List<MultiStreamController<AppUser?>>.of(_controllers)) {
+    for (final controller in List<MultiStreamController<AppUser?>>.of(
+      _controllers,
+    )) {
       controller.close();
     }
     _controllers.clear();

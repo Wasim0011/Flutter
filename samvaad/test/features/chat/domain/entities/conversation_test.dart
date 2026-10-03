@@ -24,17 +24,20 @@ void main() {
       expect(group.isGroup, isTrue);
     });
 
-    test('otherParticipantId returns the non-current participant for direct chats', () {
-      final direct = Conversation(
-        id: 'c1',
-        type: ConversationType.direct,
-        participantIds: const ['u1', 'u2'],
-        createdAt: createdAt,
-      );
+    test(
+      'otherParticipantId returns the non-current participant for direct chats',
+      () {
+        final direct = Conversation(
+          id: 'c1',
+          type: ConversationType.direct,
+          participantIds: const ['u1', 'u2'],
+          createdAt: createdAt,
+        );
 
-      expect(direct.otherParticipantId('u1'), 'u2');
-      expect(direct.otherParticipantId('u2'), 'u1');
-    });
+        expect(direct.otherParticipantId('u1'), 'u2');
+        expect(direct.otherParticipantId('u2'), 'u1');
+      },
+    );
 
     test('otherParticipantId returns null for groups', () {
       final group = Conversation(

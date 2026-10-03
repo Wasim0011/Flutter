@@ -20,7 +20,9 @@ void main() {
         // needs a fake too — without it, the real Firestore-backed
         // provider gets constructed and fails with "no Firebase app"
         // in a plain unit test.
-        userProfileRepositoryProvider.overrideWithValue(FakeUserProfileRepository()),
+        userProfileRepositoryProvider.overrideWithValue(
+          FakeUserProfileRepository(),
+        ),
       ],
     );
   });
@@ -31,37 +33,40 @@ void main() {
   });
 
   test('starts in idle state', () {
-    expect(container.read(otpVerificationControllerProvider), isA<OtpVerificationIdle>());
+    expect(
+      container.read(otpVerificationControllerProvider),
+      isA<OtpVerificationIdle>(),
+    );
   });
 
   test('submit() succeeds with the correct OTP', () async {
-    await container.read(otpVerificationControllerProvider.notifier).submit(
-      verificationId: 'fake-verification-id',
-      otp: '123456',
-    );
+    await container
+        .read(otpVerificationControllerProvider.notifier)
+        .submit(verificationId: 'fake-verification-id', otp: '123456');
 
     final state = container.read(otpVerificationControllerProvider);
     expect(state, isA<OtpVerificationSucceeded>());
   });
 
   test('submit() fails with an incorrect OTP', () async {
-    await container.read(otpVerificationControllerProvider.notifier).submit(
-      verificationId: 'fake-verification-id',
-      otp: '000000',
-    );
+    await container
+        .read(otpVerificationControllerProvider.notifier)
+        .submit(verificationId: 'fake-verification-id', otp: '000000');
 
     final state = container.read(otpVerificationControllerProvider);
     expect(state, isA<OtpVerificationFailed>());
   });
 
   test('reset() returns to idle', () async {
-    await container.read(otpVerificationControllerProvider.notifier).submit(
-      verificationId: 'fake-verification-id',
-      otp: '123456',
-    );
+    await container
+        .read(otpVerificationControllerProvider.notifier)
+        .submit(verificationId: 'fake-verification-id', otp: '123456');
     container.read(otpVerificationControllerProvider.notifier).reset();
 
-    expect(container.read(otpVerificationControllerProvider), isA<OtpVerificationIdle>());
+    expect(
+      container.read(otpVerificationControllerProvider),
+      isA<OtpVerificationIdle>(),
+    );
   });
 
   test('ResendCooldownController starts at 30 and can be restarted', () {

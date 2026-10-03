@@ -32,7 +32,10 @@ class FakeUserProfileRepository implements UserProfileRepository {
   }
 
   @override
-  Future<Result<void>> saveBio({required String userId, required String bio}) async {
+  Future<Result<void>> saveBio({
+    required String userId,
+    required String bio,
+  }) async {
     _bios[userId] = bio;
     return const Result.success(null);
   }
@@ -52,13 +55,17 @@ class FakeUserProfileRepository implements UserProfileRepository {
   }
 
   @override
-  Future<Result<CommunicationPreference?>> getCommunicationPreference(String userId) async {
+  Future<Result<CommunicationPreference?>> getCommunicationPreference(
+    String userId,
+  ) async {
     return Result.success(_preferences[userId]);
   }
 
   @override
   Future<Result<String?>> findUserIdByPhoneNumber(String phoneNumber) async {
-    final entry = _phoneNumbersByUserId.entries.where((e) => e.value == phoneNumber).firstOrNull;
+    final entry = _phoneNumbersByUserId.entries
+        .where((e) => e.value == phoneNumber)
+        .firstOrNull;
     return Result.success(entry?.key);
   }
 }

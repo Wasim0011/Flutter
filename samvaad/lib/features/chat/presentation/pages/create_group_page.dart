@@ -34,7 +34,10 @@ class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
     final bool isSubmitting = state is CreateGroupSubmitting;
     final String? currentUserId = ref.watch(authStateChangesProvider).value?.id;
 
-    ref.listen<CreateGroupState>(createGroupControllerProvider, (previous, next) {
+    ref.listen<CreateGroupState>(createGroupControllerProvider, (
+      previous,
+      next,
+    ) {
       if (next is CreateGroupReady) {
         context.pushReplacement(
           AppRoutes.conversation,
@@ -82,10 +85,14 @@ class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
               Wrap(
                 spacing: 8,
                 children: _participantPhoneNumbers
-                    .map((phone) => Chip(
-                  label: Text(phone),
-                  onDeleted: () => setState(() => _participantPhoneNumbers.remove(phone)),
-                ))
+                    .map(
+                      (phone) => Chip(
+                        label: Text(phone),
+                        onDeleted: () => setState(
+                          () => _participantPhoneNumbers.remove(phone),
+                        ),
+                      ),
+                    )
                     .toList(),
               ),
               const SizedBox(height: 24),
@@ -96,7 +103,9 @@ class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
                     padding: const EdgeInsets.only(bottom: 16),
                     child: Text(
                       state.message,
-                      style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.error),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.error,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -105,18 +114,20 @@ class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
                 onPressed: (isSubmitting || currentUserId == null)
                     ? null
                     : () {
-                  ref.read(createGroupControllerProvider.notifier).create(
-                    currentUserId: currentUserId,
-                    participantPhoneNumbers: _participantPhoneNumbers,
-                    title: _titleController.text,
-                  );
-                },
+                        ref
+                            .read(createGroupControllerProvider.notifier)
+                            .create(
+                              currentUserId: currentUserId,
+                              participantPhoneNumbers: _participantPhoneNumbers,
+                              title: _titleController.text,
+                            );
+                      },
                 child: isSubmitting
                     ? const SizedBox(
-                  height: 22,
-                  width: 22,
-                  child: CircularProgressIndicator(strokeWidth: 2.5),
-                )
+                        height: 22,
+                        width: 22,
+                        child: CircularProgressIndicator(strokeWidth: 2.5),
+                      )
                     : const Text('Create group'),
               ),
             ],

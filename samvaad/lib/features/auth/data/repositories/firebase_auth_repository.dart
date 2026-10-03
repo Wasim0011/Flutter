@@ -16,7 +16,7 @@ import '../../domain/repositories/auth_repository.dart';
 /// not touching any other file.
 class FirebaseAuthRepository implements AuthRepository {
   FirebaseAuthRepository({fb.FirebaseAuth? firebaseAuth})
-      : _firebaseAuth = firebaseAuth ?? fb.FirebaseAuth.instance;
+    : _firebaseAuth = firebaseAuth ?? fb.FirebaseAuth.instance;
 
   final fb.FirebaseAuth _firebaseAuth;
 
@@ -45,7 +45,9 @@ class FirebaseAuthRepository implements AuthRepository {
       codeSent: (String verificationId, int? resendToken) {
         if (!completer.isCompleted) {
           completer.complete(
-            Result.success(PhoneVerificationSent(verificationId: verificationId)),
+            Result.success(
+              PhoneVerificationSent(verificationId: verificationId),
+            ),
           );
         }
       },
@@ -69,8 +71,8 @@ class FirebaseAuthRepository implements AuthRepository {
         verificationId: verificationId,
         smsCode: otp,
       );
-      final fb.UserCredential userCredential =
-      await _firebaseAuth.signInWithCredential(credential);
+      final fb.UserCredential userCredential = await _firebaseAuth
+          .signInWithCredential(credential);
 
       final fb.User? user = userCredential.user;
       if (user == null) {
@@ -90,7 +92,7 @@ class FirebaseAuthRepository implements AuthRepository {
   @override
   Stream<AppUser?> authStateChanges() {
     return _firebaseAuth.authStateChanges().map(
-          (fb.User? user) => user == null ? null : _toAppUser(user),
+      (fb.User? user) => user == null ? null : _toAppUser(user),
     );
   }
 
@@ -115,17 +117,23 @@ class FirebaseAuthRepository implements AuthRepository {
   Failure _mapAuthException(fb.FirebaseAuthException e) {
     switch (e.code) {
       case 'invalid-phone-number':
-        return const Failure.validation('That phone number doesn\'t look valid.');
+        return const Failure.validation(
+          'That phone number doesn\'t look valid.',
+        );
       case 'invalid-verification-code':
         return const Failure.validation('That code is incorrect.');
       case 'session-expired':
-        return const Failure.validation('That code has expired. Request a new one.');
+        return const Failure.validation(
+          'That code has expired. Request a new one.',
+        );
       case 'too-many-requests':
         return const Failure.unexpected('Too many attempts. Try again later.');
       case 'network-request-failed':
         return const Failure.network('No internet connection.');
       default:
-        return Failure.unexpected(e.message ?? 'Something went wrong (${e.code}).');
+        return Failure.unexpected(
+          e.message ?? 'Something went wrong (${e.code}).',
+        );
     }
   }
 }

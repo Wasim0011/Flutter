@@ -46,7 +46,10 @@ class OnboardingController extends _$OnboardingController {
 
     final UserProfileRepository repo = ref.read(userProfileRepositoryProvider);
 
-    final nameResult = await repo.saveDisplayName(userId: userId, displayName: displayName);
+    final nameResult = await repo.saveDisplayName(
+      userId: userId,
+      displayName: displayName,
+    );
     if (nameResult.isFailure) {
       state = OnboardingFailed(
         nameResult.fold(onSuccess: (_) => '', onFailure: (f) => f.message),
@@ -54,8 +57,10 @@ class OnboardingController extends _$OnboardingController {
       return;
     }
 
-    final preferenceResult =
-    await repo.saveCommunicationPreference(userId: userId, preference: preference);
+    final preferenceResult = await repo.saveCommunicationPreference(
+      userId: userId,
+      preference: preference,
+    );
 
     if (preferenceResult.isSuccess) {
       // hasCompletedOnboardingProvider and displayNameProvider are
@@ -78,7 +83,9 @@ class OnboardingController extends _$OnboardingController {
 
 @riverpod
 Future<bool> hasCompletedOnboarding(Ref ref, String userId) async {
-  final result = await ref.read(userProfileRepositoryProvider).getCommunicationPreference(userId);
+  final result = await ref
+      .read(userProfileRepositoryProvider)
+      .getCommunicationPreference(userId);
   return result.fold(
     onSuccess: (preference) => preference != null,
     onFailure: (_) => false,
@@ -88,9 +95,17 @@ Future<bool> hasCompletedOnboarding(Ref ref, String userId) async {
 /// The current [CommunicationPreference] for [userId], or null if not
 /// yet set. Used by the chat feature to adapt message screen layout.
 @riverpod
-Future<CommunicationPreference?> communicationPreference(Ref ref, String userId) async {
-  final result = await ref.read(userProfileRepositoryProvider).getCommunicationPreference(userId);
-  return result.fold(onSuccess: (preference) => preference, onFailure: (_) => null);
+Future<CommunicationPreference?> communicationPreference(
+  Ref ref,
+  String userId,
+) async {
+  final result = await ref
+      .read(userProfileRepositoryProvider)
+      .getCommunicationPreference(userId);
+  return result.fold(
+    onSuccess: (preference) => preference,
+    onFailure: (_) => null,
+  );
 }
 
 /// The stored display name for [userId], or null if not set. Used by
@@ -98,7 +113,9 @@ Future<CommunicationPreference?> communicationPreference(Ref ref, String userId)
 /// names instead of raw user ids.
 @riverpod
 Future<String?> displayName(Ref ref, String userId) async {
-  final result = await ref.read(userProfileRepositoryProvider).getDisplayName(userId);
+  final result = await ref
+      .read(userProfileRepositoryProvider)
+      .getDisplayName(userId);
   return result.fold(onSuccess: (name) => name, onFailure: (_) => null);
 }
 

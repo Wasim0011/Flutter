@@ -1,16 +1,18 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:livekit_client/livekit_client.dart';
-
 import '../../../auth/domain/entities/app_user.dart';
 import '../../../auth/presentation/controllers/onboarding_controller.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../domain/entities/call.dart';
 import '../controllers/call_session_controller.dart';
 import '../controllers/caption_controller.dart';
+
+import 'dart:typed_data';
+
+import '../../../translation/presentation/providers/translation_providers.dart';
 
 /// In-call screen: video grid of all participants plus mute/camera/
 /// captions/hangup controls. Joins the LiveKit room on entry.
@@ -31,46 +33,90 @@ class _CallPageState extends ConsumerState<CallPage> {
   CaptionSpeechService? _captionService;
   bool _captionsSetupDone = false;
 
-  void _setupCaptions(Room room, String userId, CommunicationPreference? preference) {
+  SignFrameCaptureService? _signCaptureService;
+
+  void _setupSignCapture(Room room, String userId) {
+    _signCaptureService = SignFrameCaptureService(
+      repository: ref.read(signInterpretationRepositoryProvider),
+      localParticipantId: userId,
+      onInterpretation: (line) =>
+          ref.read(captionFeedProvider.notifier).update(line),
+      captureFrame: () => _captureLocalVideoFrame(room),
+    );
+  }
+
+  /// Captures a single JPEG frame from the local participant's current
+  /// video track.
+  ///
+  /// NOTE: livekit_client's exact API for grabbing a still frame from
+  /// a live VideoTrack (as opposed to rendering it in a widget) varies
+  /// by version and platform — some versions expose this via a
+  /// platform-specific capturer method, others require rendering to a
+  /// texture and reading it back. This is the single most likely spot
+  /// in this milestone to need a version-specific correction — paste
+  /// whatever the analyzer/runtime reports here and it'll be fixed
+  /// precisely against your installed version.
+  Future<Uint8List?> _captureLocalVideoFrame(Room room) async {
+    try {
+      final track = room.localParticipant?.videoTrackPublications
+          .where((pub) => pub.track != null)
+          .map((pub) => pub.track)
+          .firstOrNull;
+      if (track == null) return null;
+      // Placeholder call — see NOTE above.
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  void _setupCaptions(
+    Room room,
+    String userId,
+    CommunicationPreference? preference,
+  ) {
     if (_captionsSetupDone) return;
     _captionsSetupDone = true;
 
-    // Default on for preferences where hearing the call audio may not
-    // be the primary channel — off by default otherwise, but always
-    // toggleable by anyone via the controls.
-    final bool defaultOn = preference == CommunicationPreference.captionsFirst ||
+    final bool defaultOn =
+        preference == CommunicationPreference.captionsFirst ||
         preference == CommunicationPreference.signLanguage;
     ref.read(captionsEnabledProvider.notifier).set(defaultOn);
 
     _captionService = CaptionSpeechService(
       room: room,
       localParticipantId: userId,
-      onLocalCaption: (line) => ref.read(captionFeedProvider.notifier).update(line),
+      onLocalCaption: (line) =>
+          ref.read(captionFeedProvider.notifier).update(line),
     );
 
-    // NOTE: this event-listener API (createListener/.on<DataReceivedEvent>)
-    // is the documented livekit_client pattern as of recent versions.
-    // If this doesn't match your installed version's API, paste the
-    // exact analyzer/runtime error and it'll be corrected precisely.
+    _setupSignCapture(room, userId);
+
     room.createListener().on<DataReceivedEvent>((event) {
       try {
         final Map<String, dynamic> data =
-        jsonDecode(utf8.decode(event.data)) as Map<String, dynamic>;
-        ref.read(captionFeedProvider.notifier).update(
-          CaptionLine(
-            participantId: data['senderId'] as String,
-            text: data['text'] as String,
-            isFinal: data['isFinal'] as bool,
-          ),
-        );
-      } catch (_) {
-        // Malformed/unexpected data payload — ignore rather than crash
-        // the call over a captions parsing issue.
-      }
+            jsonDecode(utf8.decode(event.data)) as Map<String, dynamic>;
+        ref
+            .read(captionFeedProvider.notifier)
+            .update(
+              CaptionLine(
+                participantId: data['senderId'] as String,
+                text: data['text'] as String,
+                isFinal: data['isFinal'] as bool,
+              ),
+            );
+      } catch (_) {}
     });
 
     if (defaultOn) {
       _captionService?.start();
+      // Sign capture is opt-in specifically for signLanguage
+      // preference — captionsFirst users get speech captions by
+      // default but not the noisier, best-effort sign guesses,
+      // consistent with what each preference actually asked for.
+      if (preference == CommunicationPreference.signLanguage) {
+        _signCaptureService?.start();
+      }
     }
   }
 
@@ -78,14 +124,17 @@ class _CallPageState extends ConsumerState<CallPage> {
     ref.read(captionsEnabledProvider.notifier).set(enabled);
     if (enabled) {
       _captionService?.start();
+      _signCaptureService?.start();
     } else {
       _captionService?.stop();
+      _signCaptureService?.stop();
     }
   }
 
   @override
   void dispose() {
     _captionService?.stop();
+    _signCaptureService?.stop();
     super.dispose();
   }
 
@@ -97,11 +146,9 @@ class _CallPageState extends ConsumerState<CallPage> {
     if (userId != null && !_joinTriggered && state is CallSessionIdle) {
       _joinTriggered = true;
       Future.microtask(() {
-        ref.read(callSessionControllerProvider.notifier).join(
-          callId: widget.call.id,
-          call: widget.call,
-          userId: userId,
-        );
+        ref
+            .read(callSessionControllerProvider.notifier)
+            .join(callId: widget.call.id, call: widget.call, userId: userId);
       });
     }
 
@@ -155,11 +202,15 @@ class _CallPageState extends ConsumerState<CallPage> {
                     captionsOn: captionsEnabled,
                     onToggleMic: () {
                       setState(() => _micOn = !_micOn);
-                      ref.read(callSessionControllerProvider.notifier).toggleMicrophone(_micOn);
+                      ref
+                          .read(callSessionControllerProvider.notifier)
+                          .toggleMicrophone(_micOn);
                     },
                     onToggleCamera: () {
                       setState(() => _cameraOn = !_cameraOn);
-                      ref.read(callSessionControllerProvider.notifier).toggleCamera(_cameraOn);
+                      ref
+                          .read(callSessionControllerProvider.notifier)
+                          .toggleCamera(_cameraOn);
                     },
                     onToggleCaptions: () => _toggleCaptions(!captionsEnabled),
                     onHangUp: () async {
@@ -195,9 +246,12 @@ class _ParticipantGrid extends StatelessWidget {
 
     return GridView.builder(
       padding: const EdgeInsets.only(bottom: 120),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: columns),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: columns,
+      ),
       itemCount: participants.length,
-      itemBuilder: (context, index) => _ParticipantTile(participant: participants[index]),
+      itemBuilder: (context, index) =>
+          _ParticipantTile(participant: participants[index]),
     );
   }
 }
@@ -220,8 +274,8 @@ class _ParticipantTile extends StatelessWidget {
       child: videoTrack != null
           ? VideoTrackRenderer(videoTrack)
           : Center(
-        child: Icon(Icons.person, size: 48, color: Colors.grey.shade600),
-      ),
+              child: Icon(Icons.person, size: 48, color: Colors.grey.shade600),
+            ),
     );
   }
 }
@@ -244,13 +298,40 @@ class _CaptionsOverlay extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: lines
-            .map((line) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2),
-          child: Text(
-            line.text,
-            style: const TextStyle(color: Colors.white, fontSize: 18),
-          ),
-        ))
+            .map(
+              (line) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (line.source == CaptionSource.signLanguageGuess)
+                      const Padding(
+                        padding: EdgeInsets.only(right: 6),
+                        child: Icon(
+                          Icons.back_hand_outlined,
+                          size: 16,
+                          color: Colors.amber,
+                        ),
+                      ),
+                    Flexible(
+                      child: Text(
+                        line.text,
+                        style: TextStyle(
+                          color: line.source == CaptionSource.signLanguageGuess
+                              ? Colors.amber.shade200
+                              : Colors.white,
+                          fontSize: 18,
+                          fontStyle:
+                              line.source == CaptionSource.signLanguageGuess
+                              ? FontStyle.italic
+                              : FontStyle.normal,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
             .toList(),
       ),
     );

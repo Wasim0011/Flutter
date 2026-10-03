@@ -29,12 +29,13 @@ class CommunityHomePage extends StatelessWidget {
             ),
           ],
           bottom: const TabBar(
-            tabs: [Tab(text: 'Directory'), Tab(text: 'Groups')],
+            tabs: [
+              Tab(text: 'Directory'),
+              Tab(text: 'Groups'),
+            ],
           ),
         ),
-        body: const TabBarView(
-          children: [_DirectoryTab(), _GroupsTab()],
-        ),
+        body: const TabBarView(children: [_DirectoryTab(), _GroupsTab()]),
       ),
     );
   }
@@ -46,7 +47,9 @@ class _DirectoryTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
-    final AsyncValue<List<PublicProfile>> directoryAsync = ref.watch(directoryProvider);
+    final AsyncValue<List<PublicProfile>> directoryAsync = ref.watch(
+      directoryProvider,
+    );
     final String? currentUserId = ref.watch(authStateChangesProvider).value?.id;
 
     return directoryAsync.when(
@@ -54,12 +57,15 @@ class _DirectoryTab extends ConsumerWidget {
       error: (error, stackTrace) => Center(
         child: Text(
           'Couldn\'t load the directory.',
-          style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.error),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.error,
+          ),
         ),
       ),
       data: (profiles) {
-        final List<PublicProfile> others =
-        profiles.where((p) => p.userId != currentUserId).toList();
+        final List<PublicProfile> others = profiles
+            .where((p) => p.userId != currentUserId)
+            .toList();
         if (others.isEmpty) {
           return Center(
             child: Text(
@@ -79,9 +85,14 @@ class _DirectoryTab extends ConsumerWidget {
               leading: CircleAvatar(child: Text(profile.initials)),
               title: Text(profile.displayName),
               subtitle: profile.bio != null
-                  ? Text(profile.bio!, maxLines: 1, overflow: TextOverflow.ellipsis)
+                  ? Text(
+                      profile.bio!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )
                   : null,
-              onTap: () => context.push(AppRoutes.publicProfile, extra: profile.userId),
+              onTap: () =>
+                  context.push(AppRoutes.publicProfile, extra: profile.userId),
             );
           },
         );
@@ -96,7 +107,9 @@ class _GroupsTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
-    final AsyncValue<List<CommunityGroup>> groupsAsync = ref.watch(groupsProvider);
+    final AsyncValue<List<CommunityGroup>> groupsAsync = ref.watch(
+      groupsProvider,
+    );
     final String? currentUserId = ref.watch(authStateChangesProvider).value?.id;
 
     return Scaffold(
@@ -112,7 +125,9 @@ class _GroupsTab extends ConsumerWidget {
         error: (error, stackTrace) => Center(
           child: Text(
             'Couldn\'t load groups.',
-            style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.error),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.error,
+            ),
           ),
         ),
         data: (groups) {
@@ -134,7 +149,9 @@ class _GroupsTab extends ConsumerWidget {
               return ListTile(
                 leading: const CircleAvatar(child: Icon(Icons.groups)),
                 title: Text(group.name),
-                subtitle: Text('${group.memberCount} member${group.memberCount == 1 ? '' : 's'}'),
+                subtitle: Text(
+                  '${group.memberCount} member${group.memberCount == 1 ? '' : 's'}',
+                ),
                 onTap: () => context.push(AppRoutes.groupDetail, extra: group),
               );
             },
@@ -176,14 +193,19 @@ class _CreateGroupSheetState extends ConsumerState<_CreateGroupSheet> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final CreateCommunityGroupState state = ref.watch(createCommunityGroupControllerProvider);
+    final CreateCommunityGroupState state = ref.watch(
+      createCommunityGroupControllerProvider,
+    );
     final bool isSubmitting = state is CreateCommunityGroupSubmitting;
 
-    ref.listen<CreateCommunityGroupState>(createCommunityGroupControllerProvider, (previous, next) {
-      if (next is CreateCommunityGroupReady && context.mounted) {
-        Navigator.of(context).pop();
-      }
-    });
+    ref.listen<CreateCommunityGroupState>(
+      createCommunityGroupControllerProvider,
+      (previous, next) {
+        if (next is CreateCommunityGroupReady && context.mounted) {
+          Navigator.of(context).pop();
+        }
+      },
+    );
 
     return Padding(
       padding: EdgeInsets.only(
@@ -206,7 +228,9 @@ class _CreateGroupSheetState extends ConsumerState<_CreateGroupSheet> {
           TextField(
             controller: _descriptionController,
             maxLines: 2,
-            decoration: const InputDecoration(labelText: 'Description (optional)'),
+            decoration: const InputDecoration(
+              labelText: 'Description (optional)',
+            ),
           ),
           const SizedBox(height: 16),
           if (state is CreateCommunityGroupFailed)
@@ -214,23 +238,27 @@ class _CreateGroupSheetState extends ConsumerState<_CreateGroupSheet> {
               padding: const EdgeInsets.only(bottom: 12),
               child: Text(
                 state.message,
-                style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.error),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.error,
+                ),
               ),
             ),
           ElevatedButton(
             onPressed: isSubmitting
                 ? null
-                : () => ref.read(createCommunityGroupControllerProvider.notifier).create(
-              createdBy: widget.currentUserId,
-              name: _nameController.text,
-              description: _descriptionController.text,
-            ),
+                : () => ref
+                      .read(createCommunityGroupControllerProvider.notifier)
+                      .create(
+                        createdBy: widget.currentUserId,
+                        name: _nameController.text,
+                        description: _descriptionController.text,
+                      ),
             child: isSubmitting
                 ? const SizedBox(
-              height: 22,
-              width: 22,
-              child: CircularProgressIndicator(strokeWidth: 2.5),
-            )
+                    height: 22,
+                    width: 22,
+                    child: CircularProgressIndicator(strokeWidth: 2.5),
+                  )
                 : const Text('Create'),
           ),
         ],

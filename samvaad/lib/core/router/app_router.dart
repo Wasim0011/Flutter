@@ -23,7 +23,6 @@ import '../../features/community/presentation/pages/public_profile_page.dart';
 
 part 'app_router.g.dart';
 
-
 @riverpod
 GoRouter appRouter(Ref ref) {
   final AsyncValue<AppUser?> authState = ref.watch(authStateChangesProvider);
@@ -36,11 +35,14 @@ GoRouter appRouter(Ref ref) {
       // While the very first auth-state event hasn't arrived yet,
       // stay on splash rather than guessing.
       if (authState.isLoading) {
-        return state.matchedLocation == AppRoutes.splash ? null : AppRoutes.splash;
+        return state.matchedLocation == AppRoutes.splash
+            ? null
+            : AppRoutes.splash;
       }
 
       final bool isSignedIn = currentUser != null;
-      final bool onAuthRoute = state.matchedLocation == AppRoutes.phoneEntry ||
+      final bool onAuthRoute =
+          state.matchedLocation == AppRoutes.phoneEntry ||
           state.matchedLocation == AppRoutes.otpVerification;
       final bool onOnboarding = state.matchedLocation == AppRoutes.onboarding;
       final bool onSplash = state.matchedLocation == AppRoutes.splash;
@@ -54,8 +56,9 @@ GoRouter appRouter(Ref ref) {
       }
 
       if (isSignedIn) {
-        final AsyncValue<bool> onboardingDone =
-        ref.watch(hasCompletedOnboardingProvider(currentUser.id));
+        final AsyncValue<bool> onboardingDone = ref.watch(
+          hasCompletedOnboardingProvider(currentUser.id),
+        );
 
         // While checking Firestore, stay put rather than guessing.
         if (onboardingDone.isLoading) return null;
@@ -131,7 +134,8 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoutes.incomingCall,
         name: AppRoutes.incomingCallName,
-        builder: (context, state) => IncomingCallPage(call: state.extra! as Call),
+        builder: (context, state) =>
+            IncomingCallPage(call: state.extra! as Call),
       ),
       GoRoute(
         path: AppRoutes.call,
@@ -146,12 +150,14 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoutes.publicProfile,
         name: AppRoutes.publicProfileName,
-        builder: (context, state) => PublicProfilePage(userId: state.extra! as String),
+        builder: (context, state) =>
+            PublicProfilePage(userId: state.extra! as String),
       ),
       GoRoute(
         path: AppRoutes.groupDetail,
         name: AppRoutes.groupDetailName,
-        builder: (context, state) => GroupDetailPage(group: state.extra! as CommunityGroup),
+        builder: (context, state) =>
+            GroupDetailPage(group: state.extra! as CommunityGroup),
       ),
       GoRoute(
         path: AppRoutes.editProfile,

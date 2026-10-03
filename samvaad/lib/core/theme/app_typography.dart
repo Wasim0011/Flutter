@@ -14,22 +14,40 @@ abstract final class AppTypography {
 
     return TextTheme(
       displayLarge: TextStyle(
-        fontSize: 32, fontWeight: FontWeight.w700, color: base, height: 1.2,
+        fontSize: 32,
+        fontWeight: FontWeight.w700,
+        color: base,
+        height: 1.2,
       ),
       headlineMedium: TextStyle(
-        fontSize: 24, fontWeight: FontWeight.w600, color: base, height: 1.3,
+        fontSize: 24,
+        fontWeight: FontWeight.w600,
+        color: base,
+        height: 1.3,
       ),
       titleLarge: TextStyle(
-        fontSize: 20, fontWeight: FontWeight.w600, color: base, height: 1.3,
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+        color: base,
+        height: 1.3,
       ),
       bodyLarge: TextStyle(
-        fontSize: 17, fontWeight: FontWeight.w400, color: base, height: 1.5,
+        fontSize: 17,
+        fontWeight: FontWeight.w400,
+        color: base,
+        height: 1.5,
       ),
       bodyMedium: TextStyle(
-        fontSize: 15, fontWeight: FontWeight.w400, color: base, height: 1.5,
+        fontSize: 15,
+        fontWeight: FontWeight.w400,
+        color: base,
+        height: 1.5,
       ),
       labelLarge: TextStyle(
-        fontSize: 14, fontWeight: FontWeight.w600, color: base, height: 1.4,
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: base,
+        height: 1.4,
       ),
     );
   }

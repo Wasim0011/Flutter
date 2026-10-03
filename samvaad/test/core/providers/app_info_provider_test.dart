@@ -15,9 +15,7 @@ void main() {
 
     test('can be overridden in tests', () {
       final ProviderContainer container = ProviderContainer(
-        overrides: [
-          appInfoProvider.overrideWith((ref) => 'overridden value'),
-        ],
+        overrides: [appInfoProvider.overrideWith((ref) => 'overridden value')],
       );
       addTearDown(container.dispose);
 

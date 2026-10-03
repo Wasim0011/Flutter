@@ -24,7 +24,10 @@ class _PublicProfilePageState extends ConsumerState<PublicProfilePage> {
     setState(() => _startingChat = true);
     final result = await ref
         .read(chatRepositoryProvider)
-        .createOrGetDirectConversation(currentUserId: currentUserId, otherUserId: widget.userId);
+        .createOrGetDirectConversation(
+          currentUserId: currentUserId,
+          otherUserId: widget.userId,
+        );
 
     if (!mounted) return;
     setState(() => _startingChat = false);
@@ -34,7 +37,8 @@ class _PublicProfilePageState extends ConsumerState<PublicProfilePage> {
         // Read the already-resolved profile here rather than relying on
         // build()'s local variable, which isn't in scope in this method.
         final String title =
-            ref.read(publicProfileProvider(widget.userId)).value?.displayName ?? 'Chat';
+            ref.read(publicProfileProvider(widget.userId)).value?.displayName ??
+            'Chat';
         context.pushReplacement(
           AppRoutes.conversation,
           extra: {'conversationId': conversation.id, 'title': title},
@@ -51,8 +55,9 @@ class _PublicProfilePageState extends ConsumerState<PublicProfilePage> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final AsyncValue<PublicProfile?> profileAsync =
-    ref.watch(publicProfileProvider(widget.userId));
+    final AsyncValue<PublicProfile?> profileAsync = ref.watch(
+      publicProfileProvider(widget.userId),
+    );
     final String? currentUserId = ref.watch(authStateChangesProvider).value?.id;
     final bool isSelf = currentUserId == widget.userId;
 
@@ -63,7 +68,9 @@ class _PublicProfilePageState extends ConsumerState<PublicProfilePage> {
         error: (error, stackTrace) => Center(
           child: Text(
             'Couldn\'t load this profile.',
-            style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.error),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.error,
+            ),
           ),
         ),
         data: (profile) {
@@ -82,10 +89,16 @@ class _PublicProfilePageState extends ConsumerState<PublicProfilePage> {
                 children: [
                   CircleAvatar(
                     radius: 48,
-                    child: Text(profile.initials, style: theme.textTheme.headlineMedium),
+                    child: Text(
+                      profile.initials,
+                      style: theme.textTheme.headlineMedium,
+                    ),
                   ),
                   const SizedBox(height: 16),
-                  Text(profile.displayName, style: theme.textTheme.headlineMedium),
+                  Text(
+                    profile.displayName,
+                    style: theme.textTheme.headlineMedium,
+                  ),
                   const SizedBox(height: 8),
                   Text(
                     profile.bio ?? 'No bio yet.',
@@ -105,10 +118,12 @@ class _PublicProfilePageState extends ConsumerState<PublicProfilePage> {
                             : () => _message(currentUserId),
                         icon: _startingChat
                             ? const SizedBox(
-                          height: 18,
-                          width: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
+                                height: 18,
+                                width: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
                             : const Icon(Icons.chat_bubble_outline),
                         label: const Text('Message'),
                       ),

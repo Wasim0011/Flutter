@@ -44,14 +44,14 @@ class Conversation {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          (other is Conversation &&
-              other.id == id &&
-              other.type == type &&
-              _listEquals(other.participantIds, participantIds) &&
-              other.createdAt == createdAt &&
-              other.title == title &&
-              other.lastMessagePreview == lastMessagePreview &&
-              other.lastMessageAt == lastMessageAt);
+      (other is Conversation &&
+          other.id == id &&
+          other.type == type &&
+          _listEquals(other.participantIds, participantIds) &&
+          other.createdAt == createdAt &&
+          other.title == title &&
+          other.lastMessagePreview == lastMessagePreview &&
+          other.lastMessageAt == lastMessageAt);
 
   @override
   int get hashCode => Object.hash(

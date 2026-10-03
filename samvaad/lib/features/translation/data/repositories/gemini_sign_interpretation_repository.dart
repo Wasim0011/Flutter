@@ -14,13 +14,15 @@ import '../../domain/repositories/sign_interpretation_repository.dart';
 /// This is the one file that should import `firebase_ai` for sign
 /// interpretation — the same discipline as every other data-layer
 /// implementation in this codebase.
-class GeminiSignInterpretationRepository implements SignInterpretationRepository {
+class GeminiSignInterpretationRepository
+    implements SignInterpretationRepository {
   GeminiSignInterpretationRepository({GenerativeModel? model})
-      : _model = model ??
-      FirebaseAI.googleAI().generativeModel(
-        model: 'gemini-2.5-flash',
-        systemInstruction: Content.system(_systemPrompt),
-      );
+    : _model =
+          model ??
+          FirebaseAI.googleAI().generativeModel(
+            model: 'gemini-2.5-flash',
+            systemInstruction: Content.system(_systemPrompt),
+          );
 
   final GenerativeModel _model;
 
@@ -33,7 +35,9 @@ class GeminiSignInterpretationRepository implements SignInterpretationRepository
       'NONE';
 
   @override
-  Future<Result<SignInterpretation>> interpretFrame(List<int> imageBytes) async {
+  Future<Result<SignInterpretation>> interpretFrame(
+    List<int> imageBytes,
+  ) async {
     try {
       final response = await _model.generateContent([
         Content.multi([
@@ -44,7 +48,10 @@ class GeminiSignInterpretationRepository implements SignInterpretationRepository
       final String raw = (response.text ?? '').trim();
       if (raw.isEmpty || raw.toUpperCase() == 'NONE') {
         return const Result.success(
-          SignInterpretation(text: '', confidence: InterpretationConfidence.low),
+          SignInterpretation(
+            text: '',
+            confidence: InterpretationConfidence.low,
+          ),
         );
       }
 
@@ -56,7 +63,9 @@ class GeminiSignInterpretationRepository implements SignInterpretationRepository
           ? InterpretationConfidence.medium
           : InterpretationConfidence.low;
 
-      return Result.success(SignInterpretation(text: raw, confidence: confidence));
+      return Result.success(
+        SignInterpretation(text: raw, confidence: confidence),
+      );
     } catch (e) {
       return Result.failure(Failure.unexpected(e.toString()));
     }

@@ -44,7 +44,10 @@ class EditProfileController extends _$EditProfileController {
 
     final repo = ref.read(userProfileRepositoryProvider);
 
-    final nameResult = await repo.saveDisplayName(userId: userId, displayName: displayName.trim());
+    final nameResult = await repo.saveDisplayName(
+      userId: userId,
+      displayName: displayName.trim(),
+    );
     if (nameResult.isFailure) {
       state = EditProfileFailed(
         nameResult.fold(onSuccess: (_) => '', onFailure: (f) => f.message),

@@ -12,7 +12,13 @@ Stream<List<PublicProfile>> directory(Ref ref) {
 
 @riverpod
 Future<PublicProfile?> publicProfile(Ref ref, String userId) {
-  return ref.read(communityRepositoryProvider).getPublicProfile(userId).then(
-        (result) => result.fold(onSuccess: (profile) => profile, onFailure: (_) => null),
-  );
+  return ref
+      .read(communityRepositoryProvider)
+      .getPublicProfile(userId)
+      .then(
+        (result) => result.fold(
+          onSuccess: (profile) => profile,
+          onFailure: (_) => null,
+        ),
+      );
 }

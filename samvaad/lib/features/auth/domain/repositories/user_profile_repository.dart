@@ -23,7 +23,9 @@ abstract interface class UserProfileRepository {
     required CommunicationPreference preference,
   });
 
-  Future<Result<CommunicationPreference?>> getCommunicationPreference(String userId);
+  Future<Result<CommunicationPreference?>> getCommunicationPreference(
+    String userId,
+  );
 
   Future<Result<String?>> findUserIdByPhoneNumber(String phoneNumber);
 

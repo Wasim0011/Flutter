@@ -24,16 +24,17 @@ class Message {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          (other is Message &&
-              other.id == id &&
-              other.conversationId == conversationId &&
-              other.senderId == senderId &&
-              other.text == text &&
-              other.sentAt == sentAt &&
-              other.type == type);
+      (other is Message &&
+          other.id == id &&
+          other.conversationId == conversationId &&
+          other.senderId == senderId &&
+          other.text == text &&
+          other.sentAt == sentAt &&
+          other.type == type);
 
   @override
-  int get hashCode => Object.hash(id, conversationId, senderId, text, sentAt, type);
+  int get hashCode =>
+      Object.hash(id, conversationId, senderId, text, sentAt, type);
 
   @override
   String toString() =>

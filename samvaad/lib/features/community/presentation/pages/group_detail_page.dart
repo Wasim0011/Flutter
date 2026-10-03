@@ -35,11 +35,13 @@ class _GroupDetailPageState extends ConsumerState<GroupDetailPage> {
   Future<void> _startGroupChat(CommunityGroup group, String userId) async {
     setState(() => _busy = true);
     final otherMemberIds = group.memberIds.where((id) => id != userId).toList();
-    final result = await ref.read(chatRepositoryProvider).createGroupConversation(
-      currentUserId: userId,
-      participantIds: otherMemberIds,
-      title: group.name,
-    );
+    final result = await ref
+        .read(chatRepositoryProvider)
+        .createGroupConversation(
+          currentUserId: userId,
+          participantIds: otherMemberIds,
+          title: group.name,
+        );
 
     if (!mounted) return;
     setState(() => _busy = false);
@@ -53,7 +55,9 @@ class _GroupDetailPageState extends ConsumerState<GroupDetailPage> {
       },
       onFailure: (failure) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Couldn\'t start group chat: ${failure.message}')),
+          SnackBar(
+            content: Text('Couldn\'t start group chat: ${failure.message}'),
+          ),
         );
       },
     );
@@ -68,9 +72,11 @@ class _GroupDetailPageState extends ConsumerState<GroupDetailPage> {
     // join/leave immediately); fall back to the passed-in snapshot if
     // this group isn't in the stream's current emission yet (e.g.
     // right after creation, before the first snapshot arrives).
-    final List<CommunityGroup> liveGroups = ref.watch(groupsProvider).value ?? [];
+    final List<CommunityGroup> liveGroups =
+        ref.watch(groupsProvider).value ?? [];
     final CommunityGroup group =
-        liveGroups.where((g) => g.id == widget.group.id).firstOrNull ?? widget.group;
+        liveGroups.where((g) => g.id == widget.group.id).firstOrNull ??
+        widget.group;
 
     final bool isMember = userId != null && group.isMember(userId);
 
@@ -83,7 +89,9 @@ class _GroupDetailPageState extends ConsumerState<GroupDetailPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                group.description.isEmpty ? 'No description.' : group.description,
+                group.description.isEmpty
+                    ? 'No description.'
+                    : group.description,
                 style: theme.textTheme.bodyLarge,
               ),
               const SizedBox(height: 8),
@@ -95,13 +103,17 @@ class _GroupDetailPageState extends ConsumerState<GroupDetailPage> {
               ),
               const SizedBox(height: 32),
               OutlinedButton(
-                onPressed: (_busy || userId == null) ? null : () => _toggleMembership(group, userId),
+                onPressed: (_busy || userId == null)
+                    ? null
+                    : () => _toggleMembership(group, userId),
                 child: Text(isMember ? 'Leave group' : 'Join group'),
               ),
               const SizedBox(height: 12),
               if (isMember)
                 ElevatedButton.icon(
-                  onPressed: (_busy) ? null : () => _startGroupChat(group, userId),
+                  onPressed: (_busy)
+                      ? null
+                      : () => _startGroupChat(group, userId),
                   icon: const Icon(Icons.chat_bubble_outline),
                   label: const Text('Start group chat'),
                 ),

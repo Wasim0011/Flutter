@@ -34,7 +34,10 @@ void main() {
         .read(phoneEntryControllerProvider.notifier)
         .submit('+919999999999');
 
-    expect(container.read(phoneEntryControllerProvider), isA<PhoneEntrySubmitting>());
+    expect(
+      container.read(phoneEntryControllerProvider),
+      isA<PhoneEntrySubmitting>(),
+    );
 
     await future;
 

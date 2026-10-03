@@ -39,7 +39,9 @@ class _StartChatPageState extends ConsumerState<StartChatPage> {
           AppRoutes.conversation,
           extra: {
             'conversationId': next.conversation.id,
-            'title': next.conversation.otherParticipantId(currentUserId ?? '') ?? 'Chat',
+            'title':
+                next.conversation.otherParticipantId(currentUserId ?? '') ??
+                'Chat',
           },
         );
       }
@@ -74,7 +76,9 @@ class _StartChatPageState extends ConsumerState<StartChatPage> {
                       padding: const EdgeInsets.only(bottom: 16),
                       child: Text(
                         state.message,
-                        style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.error),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.error,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -83,18 +87,22 @@ class _StartChatPageState extends ConsumerState<StartChatPage> {
                   onPressed: (isSearching || currentUserId == null)
                       ? null
                       : () {
-                    if (!(_formKey.currentState?.validate() ?? false)) return;
-                    ref.read(startChatControllerProvider.notifier).startChatWithPhoneNumber(
-                      currentUserId: currentUserId,
-                      phoneNumber: _phoneController.text.trim(),
-                    );
-                  },
+                          if (!(_formKey.currentState?.validate() ?? false)) {
+                            return;
+                          }
+                          ref
+                              .read(startChatControllerProvider.notifier)
+                              .startChatWithPhoneNumber(
+                                currentUserId: currentUserId,
+                                phoneNumber: _phoneController.text.trim(),
+                              );
+                        },
                   child: isSearching
                       ? const SizedBox(
-                    height: 22,
-                    width: 22,
-                    child: CircularProgressIndicator(strokeWidth: 2.5),
-                  )
+                          height: 22,
+                          width: 22,
+                          child: CircularProgressIndicator(strokeWidth: 2.5),
+                        )
                       : const Text('Start chat'),
                 ),
               ],
