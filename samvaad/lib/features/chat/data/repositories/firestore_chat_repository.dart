@@ -124,11 +124,15 @@ class FirestoreChatRepository implements ChatRepository {
   }
 
   @override
-  Future<Result<Conversation>> getConversationById(String conversationId) async {
+  Future<Result<Conversation>> getConversationById(
+    String conversationId,
+  ) async {
     try {
       final doc = await _conversations.doc(conversationId).get();
       if (!doc.exists) {
-        return const Result.failure(Failure.unexpected('Conversation not found.'));
+        return const Result.failure(
+          Failure.unexpected('Conversation not found.'),
+        );
       }
       return Result.success(_conversationFromDoc(doc));
     } catch (e) {
@@ -170,7 +174,9 @@ class FirestoreChatRepository implements ChatRepository {
     }
   }
 
-  Conversation _conversationFromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
+  Conversation _conversationFromDoc(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
     final data = doc.data()!;
     return Conversation(
       id: doc.id,

@@ -42,10 +42,11 @@ class FakeChatRepository implements ChatRepository {
 
   @override
   Stream<List<Message>> watchMessages(String conversationId) {
-    // ignore: close_sinks
     // False positive: this controller is stored in _messageControllers
     // and closed in dispose() — the lint can't trace across the
     // putIfAbsent callback boundary to see that.
+
+    // ignore: close_sinks
     final controller = _messageControllers.putIfAbsent(
       conversationId,
       () => StreamController<List<Message>>.broadcast(),
@@ -102,10 +103,14 @@ class FakeChatRepository implements ChatRepository {
   }
 
   @override
-  Future<Result<Conversation>> getConversationById(String conversationId) async {
+  Future<Result<Conversation>> getConversationById(
+    String conversationId,
+  ) async {
     final conversation = _conversations[conversationId];
     if (conversation == null) {
-      return const Result.failure(Failure.unexpected('Conversation not found.'));
+      return const Result.failure(
+        Failure.unexpected('Conversation not found.'),
+      );
     }
     return Result.success(conversation);
   }

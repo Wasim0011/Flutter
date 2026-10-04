@@ -44,28 +44,32 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
     ref
         .read(sendMessageControllerProvider.notifier)
         .send(
-      conversationId: widget.conversationId,
-      senderId: currentUserId,
-      text: text,
-    );
+          conversationId: widget.conversationId,
+          senderId: currentUserId,
+          text: text,
+        );
     _textController.clear();
   }
 
   Future<void> _startCall(String currentUserId) async {
-    final conversationResult =
-    await ref.read(chatRepositoryProvider).getConversationById(widget.conversationId);
+    final conversationResult = await ref
+        .read(chatRepositoryProvider)
+        .getConversationById(widget.conversationId);
 
     if (!mounted) return;
 
     conversationResult.fold(
       onSuccess: (conversation) async {
-        final calleeIds =
-        conversation.participantIds.where((id) => id != currentUserId).toList();
-        final callResult = await ref.read(callRepositoryProvider).startCall(
-          callerId: currentUserId,
-          calleeIds: calleeIds,
-          conversationId: widget.conversationId,
-        );
+        final calleeIds = conversation.participantIds
+            .where((id) => id != currentUserId)
+            .toList();
+        final callResult = await ref
+            .read(callRepositoryProvider)
+            .startCall(
+              callerId: currentUserId,
+              calleeIds: calleeIds,
+              conversationId: widget.conversationId,
+            );
 
         if (!mounted) return;
 
@@ -104,9 +108,9 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
     final SendMessageState sendState = ref.watch(sendMessageControllerProvider);
 
     ref.listen<SendMessageState>(sendMessageControllerProvider, (
-        previous,
-        next,
-        ) {
+      previous,
+      next,
+    ) {
       if (next is SendMessageFailed && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Couldn\'t send: ${next.message}')),
@@ -251,7 +255,7 @@ class _MessageBubble extends StatelessWidget {
               message.text,
               style: theme.textTheme.bodyLarge?.copyWith(
                 fontSize:
-                (theme.textTheme.bodyLarge?.fontSize ?? 17) *
+                    (theme.textTheme.bodyLarge?.fontSize ?? 17) *
                     style.fontScale,
               ),
             ),
