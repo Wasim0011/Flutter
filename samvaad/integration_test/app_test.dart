@@ -119,11 +119,15 @@ void main() {
     expect(find.text('Hello there'), findsOneWidget);
 
     // --- Start a call ---
-    // We verify navigation and connection-attempt UI only — a real
-    // LiveKit connection needs a live project and isn't exercised
-    // here, consistent with this file's documented scope.
+    // Bounded manual pumps, not pumpAndSettle — a real network attempt
+    // to LiveKit is still in flight here (or failing), and
+    // pumpAndSettle cannot return while the connecting spinner is
+    // still animating. We just need enough pumps to observe the
+    // resulting state, not to wait for it to fully settle.
     await tester.tap(find.byTooltip('Start call'));
-    await tester.pumpAndSettle(const Duration(seconds: 2));
+    for (int i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 300));
+    }
     final bool connecting = find
         .byType(CircularProgressIndicator)
         .evaluate()
@@ -136,8 +140,8 @@ void main() {
       connecting || failedToJoin,
       isTrue,
       reason:
-          'Expected the call screen to either be connecting or report a '
-          'join failure (no live LiveKit project in this test environment).',
+          'Expected the call screen to either still be connecting or report a '
+          'join failure — a real LiveKit connection is not exercised in this test.',
     );
   });
 }

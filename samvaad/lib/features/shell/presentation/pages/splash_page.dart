@@ -33,37 +33,38 @@ class _SplashPageState extends ConsumerState<SplashPage>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1400),
+      duration: const Duration(milliseconds: 3200),
     );
 
     _logoFade = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.0, 0.3, curve: Curves.easeOut),
+      curve: const Interval(0.02, 0.38, curve: Curves.easeOut),
     );
-    _logoScale = Tween<double>(begin: 0.55, end: 1.0).animate(
+    _logoScale = Tween<double>(begin: 0.72, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.0, 0.55, curve: Curves.elasticOut),
+        curve: const Interval(0.02, 0.46, curve: Curves.elasticOut),
       ),
     );
-    _titleFade = CurvedAnimation(
+
+    // Title: a subtle upward movement and fade.
+    final titleAnimation = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.35, 0.65, curve: Curves.easeOut),
+      curve: const Interval(0.30, 0.58, curve: Curves.easeOutCubic),
     );
-    _titleSlide = Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero)
-        .animate(
-          CurvedAnimation(
-            parent: _controller,
-            curve: const Interval(0.35, 0.65, curve: Curves.easeOut),
-          ),
-        );
+    _titleFade = titleAnimation;
+
+    _titleSlide = Tween<Offset>(
+      begin: const Offset(0, 0.20),
+      end: Offset.zero,
+    ).animate(titleAnimation);
     _taglineFade = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.55, 0.85, curve: Curves.easeOut),
+      curve: const Interval(0.52, 0.76, curve: Curves.easeOut),
     );
     _statusFade = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.8, 1.0, curve: Curves.easeOut),
+      curve: const Interval(0.72, 0.94, curve: Curves.easeOut),
     );
 
     _controller.forward();
@@ -113,10 +114,11 @@ class _SplashPageState extends ConsumerState<SplashPage>
                             boxShadow: [
                               BoxShadow(
                                 color: theme.colorScheme.primary.withValues(
-                                  alpha: 0.35,
+                                  alpha: 0.24,
                                 ),
-                                blurRadius: 36,
-                                spreadRadius: 6,
+                                blurRadius: 28,
+                                spreadRadius: 1,
+                                offset: const Offset(0, 8),
                               ),
                             ],
                           ),

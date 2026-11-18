@@ -10,7 +10,7 @@ part 'call_session_controller.g.dart';
 /// LiveKit Cloud project URL. Not a secret (unlike the API key/secret,
 /// which never leave the Cloud Function) — safe to keep as a constant
 /// here, same treatment as a Firebase project id.
-const String liveKitUrl = 'wss://REPLACE-WITH-YOUR-PROJECT.livekit.cloud';
+const String liveKitUrl = 'wss://samvaad-1p2w9cx4.livekit.cloud';
 
 sealed class CallSessionState {
   const CallSessionState();

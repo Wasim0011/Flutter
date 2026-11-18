@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -16,11 +17,29 @@ Future<void> bootstrap() async {
   runApp(const ProviderScope(child: SamvaadApp()));
 }
 
-class SamvaadApp extends ConsumerWidget {
+class SamvaadApp extends ConsumerStatefulWidget {
   const SamvaadApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SamvaadApp> createState() => _SamvaadAppState();
+}
+
+class _SamvaadAppState extends ConsumerState<SamvaadApp> {
+  @override
+  void initState() {
+    super.initState();
+    // Removes the native splash exactly once our own first frame has
+    // actually been scheduled — explicit and deterministic, rather
+    // than relying on the OS to decide when "ready" is, which is what
+    // makes a genuine startup hang indistinguishable from a working
+    // native splash in the first place.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FlutterNativeSplash.remove();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final GoRouter router = ref.watch(appRouterProvider);
 
     return MaterialApp.router(
@@ -30,9 +49,6 @@ class SamvaadApp extends ConsumerWidget {
       darkTheme: AppTheme.dark(),
       themeMode: ThemeMode.system,
       routerConfig: router,
-      // IncomingCallGate wraps the routed content so an incoming call
-      // can interrupt whatever screen the user is on — chat, home,
-      // anywhere — without each screen needing its own listener.
       builder: (context, child) => IncomingCallGate(child: child!),
     );
   }
