@@ -1,73 +1,85 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/widgets/app_sign_out_button.dart';
-import '../../../auth/domain/entities/app_user.dart';
-import '../../../auth/presentation/providers/auth_providers.dart';
+import '../../../../core/theme/app_colors.dart';
 
-/// Samvaad's entry screen — now a genuine first impression, not a
-/// static placeholder. The staggered entrance (glow-backed logo bounce
-/// → title slide-up → tagline fade → auth-status fade) exists
-/// specifically because this is the very first thing every user sees,
-/// and a premium first impression matters disproportionately for a
-/// first-time user's trust in the product.
-class SplashPage extends ConsumerStatefulWidget {
+/// Samvaad's entry screen: a deliberate, accessible brand entrance that
+/// bridges the native launch screen and the authenticated app shell.
+class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
 
   @override
-  ConsumerState<SplashPage> createState() => _SplashPageState();
+  State<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashPageState extends ConsumerState<SplashPage>
+class _SplashPageState extends State<SplashPage>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late final Animation<double> _logoScale;
   late final Animation<double> _logoFade;
+  late final Animation<double> _logoScale;
+  late final Animation<double> _glowScale;
   late final Animation<Offset> _titleSlide;
   late final Animation<double> _titleFade;
   late final Animation<double> _taglineFade;
-  late final Animation<double> _statusFade;
+  late final Animation<double> _loaderFade;
+  bool _started = false;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 3200),
+      duration: const Duration(milliseconds: 2200),
     );
 
     _logoFade = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.02, 0.38, curve: Curves.easeOut),
+      curve: const Interval(0.0, 0.35, curve: Curves.easeOut),
     );
-    _logoScale = Tween<double>(begin: 0.72, end: 1.0).animate(
+    _logoScale = Tween<double>(begin: 0.78, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.02, 0.46, curve: Curves.elasticOut),
+        curve: const Interval(0.0, 0.48, curve: Curves.easeOutBack),
+      ),
+    );
+    _glowScale = Tween<double>(begin: 0.85, end: 1.08).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.10, 0.85, curve: Curves.easeInOut),
       ),
     );
 
-    // Title: a subtle upward movement and fade.
-    final titleAnimation = CurvedAnimation(
+    final Animation<double> titleCurve = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.30, 0.58, curve: Curves.easeOutCubic),
+      curve: const Interval(0.28, 0.62, curve: Curves.easeOutCubic),
     );
-    _titleFade = titleAnimation;
-
+    _titleFade = titleCurve;
     _titleSlide = Tween<Offset>(
-      begin: const Offset(0, 0.20),
+      begin: const Offset(0, 0.22),
       end: Offset.zero,
-    ).animate(titleAnimation);
+    ).animate(titleCurve);
+
     _taglineFade = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.52, 0.76, curve: Curves.easeOut),
-    );
-    _statusFade = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.72, 0.94, curve: Curves.easeOut),
+      curve: const Interval(0.50, 0.82, curve: Curves.easeOut),
     );
 
-    _controller.forward();
+    _loaderFade = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.75, 1.0, curve: Curves.easeOut),
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_started) return;
+    _started = true;
+
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _controller.value = 1.0;
+    } else {
+      _controller.forward();
+    }
   }
 
   @override
@@ -79,117 +91,139 @@ class _SplashPageState extends ConsumerState<SplashPage>
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final AsyncValue<AppUser?> authState = ref.watch(authStateChangesProvider);
+    final bool isDark = theme.brightness == Brightness.dark;
+    final Color brandTeal = AppColors.primary;
 
     return Scaffold(
       body: DecoratedBox(
         decoration: BoxDecoration(
           gradient: RadialGradient(
-            center: Alignment.topCenter,
-            radius: 1.3,
-            colors: [
-              theme.colorScheme.primary.withValues(alpha: 0.14),
-              theme.colorScheme.surface,
-            ],
+            center: const Alignment(0, -0.25),
+            radius: 1.25,
+            colors: isDark
+                ? <Color>[
+                    brandTeal.withValues(alpha: 0.32),
+                    AppColors.surfaceDark,
+                  ]
+                : <Color>[
+                    brandTeal.withValues(alpha: 0.14),
+                    AppColors.surfaceLight,
+                  ],
           ),
         ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: AnimatedBuilder(
-              animation: _controller,
-              builder: (context, _) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    FadeTransition(
-                      opacity: _logoFade,
-                      child: ScaleTransition(
-                        scale: _logoScale,
-                        child: Container(
-                          padding: const EdgeInsets.all(22),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primary,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: theme.colorScheme.primary.withValues(
-                                  alpha: 0.24,
+        child: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 28),
+              child: AnimatedBuilder(
+                animation: _controller,
+                builder: (context, _) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      FadeTransition(
+                        opacity: _logoFade,
+                        child: ScaleTransition(
+                          scale: _logoScale,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: <Widget>[
+                              ScaleTransition(
+                                scale: _glowScale,
+                                child: Container(
+                                  width: 124,
+                                  height: 124,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: RadialGradient(
+                                      colors: <Color>[
+                                        AppColors.accent.withValues(
+                                          alpha: 0.22,
+                                        ),
+                                        brandTeal.withValues(alpha: 0.0),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                                blurRadius: 28,
-                                spreadRadius: 1,
-                                offset: const Offset(0, 8),
+                              ),
+                              Container(
+                                width: 100,
+                                height: 100,
+                                padding: const EdgeInsets.all(18),
+                                decoration: BoxDecoration(
+                                  color: brandTeal,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: AppColors.accent.withValues(
+                                      alpha: 0.45,
+                                    ),
+                                    width: 1.5,
+                                  ),
+                                  boxShadow: <BoxShadow>[
+                                    BoxShadow(
+                                      color: brandTeal.withValues(alpha: 0.30),
+                                      blurRadius: 28,
+                                      spreadRadius: 2,
+                                      offset: const Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+                                child: Image.asset(
+                                  'assets/icon/icon_foreground.png',
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (_, _, _) => const Icon(
+                                    Icons.forum_rounded,
+                                    size: 52,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
-                          child: const Icon(
-                            Icons.forum_rounded,
-                            size: 56,
-                            color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 28),
+                      SlideTransition(
+                        position: _titleSlide,
+                        child: FadeTransition(
+                          opacity: _titleFade,
+                          child: Text(
+                            'Samvaad',
+                            style: theme.textTheme.displayLarge?.copyWith(
+                              color: isDark ? Colors.white : brandTeal,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -0.5,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    SlideTransition(
-                      position: _titleSlide,
-                      child: FadeTransition(
-                        opacity: _titleFade,
+                      const SizedBox(height: 10),
+                      FadeTransition(
+                        opacity: _taglineFade,
                         child: Text(
-                          'Samvaad',
-                          style: theme.textTheme.displayLarge?.copyWith(
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    FadeTransition(
-                      opacity: _taglineFade,
-                      child: Text(
-                        'Every voice, every sign, one conversation.',
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                    FadeTransition(
-                      opacity: _statusFade,
-                      child: authState.when(
-                        loading: () => const SizedBox(
-                          height: 22,
-                          width: 22,
-                          child: CircularProgressIndicator(strokeWidth: 2.5),
-                        ),
-                        error: (error, stackTrace) => Text(
-                          'Something went wrong. Please restart the app.',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.error,
+                          'Every voice, every sign, one conversation.',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        data: (user) => user != null
-                            ? Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'Signed in as ${user.phoneNumber}',
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: theme.colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                  const AppSignOutButton(),
-                                ],
-                              )
-                            : const SizedBox.shrink(),
                       ),
-                    ),
-                  ],
-                );
-              },
+                      const SizedBox(height: 44),
+                      FadeTransition(
+                        opacity: _loaderFade,
+                        child: const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: AppColors.accent,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
         ),

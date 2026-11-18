@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../shell/presentation/providers/splash_providers.dart';
 import '../../domain/entities/app_user.dart';
 import '../controllers/onboarding_controller.dart';
 import 'auth_providers.dart';
@@ -12,7 +13,7 @@ sealed class AppSession {
   const AppSession();
 }
 
-/// Auth (or the onboarding lookup) hasn't answered yet.
+/// Auth, onboarding lookup, or the initial brand splash hold hasn't finished yet.
 final class AppSessionLoading extends AppSession {
   const AppSessionLoading();
 }
@@ -36,7 +37,12 @@ final class AppSessionReady extends AppSessionSignedIn {
 
 @Riverpod(keepAlive: true)
 AppSession appSession(Ref ref) {
+  final AsyncValue<void> hold = ref.watch(splashHoldProvider);
   final AsyncValue<AppUser?> auth = ref.watch(authStateChangesProvider);
+
+  if (hold.isLoading) {
+    return const AppSessionLoading();
+  }
 
   return auth.when<AppSession>(
     loading: () => const AppSessionLoading(),
@@ -44,8 +50,6 @@ AppSession appSession(Ref ref) {
     data: (user) {
       if (user == null) return const AppSessionSignedOut();
 
-      // Legitimate ref.watch: it runs inside this provider's own build, so
-      // Riverpod re-runs this provider (not the router) when it changes.
       final AsyncValue<bool> onboarding = ref.watch(
         hasCompletedOnboardingProvider(user.id),
       );

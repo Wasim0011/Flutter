@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:samvaad/features/auth/domain/entities/app_user.dart';
 import 'package:samvaad/features/auth/presentation/controllers/onboarding_controller.dart';
 import 'package:samvaad/features/auth/presentation/providers/app_session.dart';
 import 'package:samvaad/features/auth/presentation/providers/auth_providers.dart';
+import 'package:samvaad/features/shell/presentation/providers/splash_providers.dart';
+
 import '../../fakes/fake_auth_repository.dart';
 import '../../fakes/fake_user_profile_repository.dart';
 
@@ -18,6 +22,7 @@ void main() {
     profiles = FakeUserProfileRepository();
     container = ProviderContainer(
       overrides: [
+        splashHoldProvider.overrideWith((ref) async {}),
         authRepositoryProvider.overrideWithValue(auth),
         userProfileRepositoryProvider.overrideWithValue(profiles),
       ],
@@ -34,6 +39,33 @@ void main() {
   Future<void> settle() =>
       Future<void>.delayed(const Duration(milliseconds: 20));
   Future<void> signIn() => auth.verifyOtp(verificationId: 'x', otp: '123456');
+
+  test('remains loading while splash hold is pending', () async {
+    final Completer<void> holdCompleter = Completer<void>();
+    final FakeAuthRepository localAuth = FakeAuthRepository();
+    final ProviderContainer localContainer = ProviderContainer(
+      overrides: [
+        splashHoldProvider.overrideWith((ref) => holdCompleter.future),
+        authRepositoryProvider.overrideWithValue(localAuth),
+        userProfileRepositoryProvider.overrideWithValue(profiles),
+      ],
+    );
+    final ProviderSubscription<AppSession> sub = localContainer.listen(
+      appSessionProvider,
+      (previous, next) {},
+    );
+
+    await settle();
+    expect(localContainer.read(appSessionProvider), isA<AppSessionLoading>());
+
+    holdCompleter.complete();
+    await settle();
+    expect(localContainer.read(appSessionProvider), isA<AppSessionSignedOut>());
+
+    sub.close();
+    localAuth.dispose();
+    localContainer.dispose();
+  });
 
   test('signed out when nobody is signed in', () async {
     await settle();

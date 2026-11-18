@@ -12,9 +12,32 @@ import 'firebase_options.dart';
 Future<void> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  runApp(const ProviderScope(child: SamvaadApp()));
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    runApp(const ProviderScope(child: SamvaadApp()));
+  } catch (e) {
+    FlutterNativeSplash.remove();
+    runApp(
+      MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light(),
+        darkTheme: AppTheme.dark(),
+        home: const Scaffold(
+          body: Center(
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: Text(
+                'Couldn\'t start Samvaad. Please check your connection and restart.',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class SamvaadApp extends ConsumerStatefulWidget {

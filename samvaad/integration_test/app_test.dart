@@ -18,6 +18,8 @@ import '../test/features/community/fakes/fake_community_repository.dart';
 import '../test/features/translation/fakes/fake_sign_interpretation_repository.dart';
 import '../test/test_utils/firebase_test_setup.dart';
 
+import 'package:samvaad/features/shell/presentation/providers/splash_providers.dart';
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -65,6 +67,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          splashHoldProvider.overrideWith((ref) async {}),
           authRepositoryProvider.overrideWithValue(fakeAuth),
           userProfileRepositoryProvider.overrideWithValue(fakeProfiles),
           chatRepositoryProvider.overrideWithValue(fakeChat),

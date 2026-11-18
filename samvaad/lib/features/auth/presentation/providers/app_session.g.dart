@@ -48,4 +48,4 @@ final class AppSessionProvider
   }
 }
 
-String _$appSessionHash() => r'9d6cc06f15546b89b915559ab56941b743b82c5a';
+String _$appSessionHash() => r'562e236b52a7ca70f295f088d91465fe0f294bd9';
